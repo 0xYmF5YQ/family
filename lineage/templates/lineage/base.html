@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Family App{% endblock %}</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="flex bg-slate-100">
+
+    <!-- Sidebar -->
+    <aside class="w-64 h-screen bg-white border-r border-slate-200 flex flex-col shrink-0">
+        <div class="p-6 border-b">
+            <h1 class="text-2xl font-bold text-indigo-600 flex items-center gap-2">
+                <i class="fas fa-monument text-xl"></i> Legacy
+            </h1>
+        </div>
+
+        <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 pb-2">Management</p>
+
+            <a href="{% url 'parents' %}"
+               class="flex items-center gap-3 p-3 rounded-xl font-medium transition group
+               {% if request.resolver_match.url_name == 'parents' %}bg-indigo-50 text-indigo-600{% else %}text-slate-600 hover:bg-slate-50 hover:text-indigo-600{% endif %}">
+                <i class="fas fa-user-tie w-5 group-hover:scale-110 transition"></i> Parents
+            </a>
+
+            <a href="{% url 'children' %}"
+               class="flex items-center gap-3 p-3 rounded-xl font-medium transition group
+               {% if request.resolver_match.url_name == 'children' %}bg-indigo-50 text-indigo-600{% else %}text-slate-600 hover:bg-slate-50 hover:text-indigo-600{% endif %}">
+                <i class="fas fa-child w-5 group-hover:scale-110 transition"></i> Children
+            </a>
+
+            <a href="{% url 'contributions' %}"
+               class="flex items-center gap-3 p-3 rounded-xl font-medium transition group
+               {% if request.resolver_match.url_name == 'contributions' %}bg-indigo-50 text-indigo-600{% else %}text-slate-600 hover:bg-slate-50 hover:text-indigo-600{% endif %}">
+                <i class="fas fa-hand-holding-heart w-5 group-hover:scale-110 transition"></i> Contributions
+            </a>
+
+            <a href="{% url 'assets' %}"
+               class="flex items-center gap-3 p-3 rounded-xl font-medium transition group
+               {% if request.resolver_match.url_name == 'assets' %}bg-indigo-50 text-indigo-600{% else %}text-slate-600 hover:bg-slate-50 hover:text-indigo-600{% endif %}">
+                <i class="fas fa-map-marked-alt w-5 group-hover:scale-110 transition"></i> Assets
+            </a>
+        </nav>
+
+        <div class="p-4 border-t bg-slate-50">
+            {% if user.is_authenticated %}
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold shadow-sm">
+                        {{ user.username|slice:":2"|upper }}
+                    </div>
+                    <div class="overflow-hidden">
+                        <p class="text-sm font-bold text-slate-800 truncate">
+                            {{ user.get_full_name|default:user.username }}
+                        </p>
+                        <p class="text-[10px] text-slate-500 font-bold uppercase">Family Admin</p>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-center py-6">
+                    <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-slate-200 flex items-center justify-center text-slate-400">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <p class="text-sm font-bold text-slate-500">Family Admin</p>
+                    <p class="text-xs text-slate-400">Login to manage lineage data</p>
+                </div>
+            {% endif %}
+        </div>
+
+    </aside>
+
+    <!-- Main Page Area -->
+    <main class="flex-1 p-8 overflow-y-auto">
+        <h1 class="text-3xl font-bold mb-6">
+            {% block header_title %}{% endblock %}
+        </h1>
+
+        {% block content %}{% endblock %}
+    </main>
+
+</body>
+</html>

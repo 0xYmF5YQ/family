@@ -1,0 +1,230 @@
+{% extends 'lineage/base.html' %}
+
+{% block title %}Family Assets{% endblock %}
+
+{% block content %}
+<div class="animate__animated animate__fadeIn space-y-8">
+
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h2 class="text-3xl font-extrabold text-slate-800 tracking-tight">Family Holdings</h2>
+            <p class="text-slate-500 font-medium">Collective assets and investments of the lineage</p>
+        </div>
+        <button id="openAssetModal" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-lg shadow-indigo-100 flex items-center gap-2 transform active:scale-95">
+            <i class="fas fa-plus-circle"></i> Register New Asset
+        </button>
+    </div>
+
+    <!-- Total Valuation Card -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-5">
+            <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div>
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Total Valuation</p>
+                <h3 class="text-2xl font-black text-slate-800">Ksh {{ total_valuation|floatformat:0 }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assets Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-6">
+        {% for asset in assets %}
+        <div class="group bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer" onclick="openAssetDrawer('{{ asset.id }}')">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="px-3 py-1 bg-slate-100 text-slate-600 text-[10px] font-bold uppercase rounded-full">
+                        {{ asset.get_category_display }}
+                    </span>
+                    <i class="fas fa-ellipsis-v text-slate-300 hover:text-slate-600 cursor-pointer"></i>
+                </div>
+
+                <h4 class="text-xl font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">{{ asset.title }}</h4>
+
+                {% if asset.category == 'LAND' %}
+                <div class="mt-4 space-y-2">
+                    <div class="flex items-center gap-3 text-slate-500">
+                        <i class="fas fa-map-marker-alt w-5 text-indigo-400"></i>
+                        <span class="text-sm font-medium">{{ asset.location }}</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-slate-500">
+                        <i class="fas fa-vector-square w-5 text-emerald-400"></i>
+                        <span class="text-sm font-medium">{{ asset.size }}</span>
+                    </div>
+                </div>
+                {% else %}
+                <p class="mt-4 text-sm text-slate-500 line-clamp-2 italic">
+                    {{ asset.description|default:"No specific details provided." }}
+                </p>
+                {% endif %}
+            </div>
+
+            <div class="px-6 py-4 bg-slate-50/50 border-t border-slate-50 flex justify-between items-center">
+                <div>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase">Estimated Value</p>
+                    <p class="text-lg font-black text-slate-800">Ksh {{ asset.valuation }}</p>
+                </div>
+                <button class="w-10 h-10 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-indigo-600 hover:border-indigo-100 transition flex items-center justify-center shadow-sm">
+                    <i class="fas fa-arrow-right text-xs"></i>
+                </button>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full py-20 text-center">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-slate-50 text-slate-300 rounded-full mb-4">
+                <i class="fas fa-box-open text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-600">No assets recorded yet</h3>
+            <p class="text-slate-400">Start building the family portfolio today.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Asset Drawer -->
+<div id="assetDrawer" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50">
+    <div class="absolute right-0 top-0 h-full w-full max-w-3xl bg-white shadow-2xl animate__animated animate__slideInRight flex flex-col">
+        <div class="p-6 border-b flex justify-between items-center">
+            <div>
+                <h3 id="drawerTitle" class="text-xl font-bold text-slate-800"></h3>
+                <p id="drawerMeta" class="text-sm text-slate-500"></p>
+            </div>
+            <button onclick="closeAssetDrawer()" class="text-slate-400 hover:text-slate-700">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <div class="p-6 space-y-6 overflow-y-auto">
+            <div class="flex justify-between items-center">
+                <h4 class="font-bold text-slate-700">Owners / Contributors</h4>
+                <button id="openOwnerModal" class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-emerald-700">
+                    <i class="fas fa-user-plus"></i> Add Owner
+                </button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full border rounded-xl overflow-hidden">
+                    <thead class="bg-slate-50 text-xs uppercase text-slate-500 font-bold">
+                        <tr>
+                            <th class="px-4 py-3 text-left">Member</th>
+                            <th class="px-4 py-3">Contribution/Share</th>
+                            <th class="px-4 py-3">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">
+                        {% for o in selected_asset.owners.all %}
+                        <tr>
+                            <td class="px-4 py-3 font-medium text-slate-700">{{ o.member_name }}</td>
+                            <td class="px-4 py-3 font-bold text-emerald-600">{{ o.share }}</td>
+                            <td class="px-4 py-3 text-sm text-slate-500">{{ o.created_at|date:"M d, Y" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="px-4 py-6 text-center text-slate-400 italic">No owners yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Owner Modal -->
+<div id="ownerModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
+        <div class="bg-emerald-600 p-6 text-white text-center">
+            <h3 class="text-xl font-bold">Add Owner / Contributor</h3>
+        </div>
+        <form method="post" action="#" class="p-6 space-y-4">
+            {% csrf_token %}
+            {{ owner_form.as_p }}
+            <button class="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold">Save Owner</button>
+            <button type="button" onclick="closeOwnerModal()" class="w-full text-sm text-slate-400">Cancel</button>
+        </form>
+    </div>
+</div>
+
+<!-- Asset Modal -->
+<div id="assetModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4 overflow-y-auto">
+    <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-lg transform scale-95 opacity-0 transition-all duration-300 my-auto" id="assetModalBox">
+        <div class="p-8">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h3 class="text-2xl font-bold text-slate-800">Register New Asset</h3>
+                    <p class="text-slate-500 text-sm">Fill in the details to update family records</p>
+                </div>
+                <button onclick="closeAssetModal()" class="text-slate-400 hover:text-slate-600 transition">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <form method="post" action="{% url 'add_asset' %}">
+                {% csrf_token %}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Asset Name</label>
+                        {{ form.title }}
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Category</label>
+                        {{ form.category }}
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Valuation (Ksh)</label>
+                        {{ form.valuation }}
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Location</label>
+                        {{ form.location }}
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Size / Metric</label>
+                        {{ form.size }}
+                    </div>
+                </div>
+
+                <button type="submit" class="mt-8 w-full bg-slate-800 text-white px-6 py-4 rounded-2xl font-bold hover:bg-slate-900 transition-all shadow-xl active:scale-[0.98]">
+                    Confirm & Save Asset
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    
+    const aModal = document.getElementById('assetModal');
+    const aBox = document.getElementById('assetModalBox');
+    const ownerModal = document.getElementById('ownerModal');
+
+    document.getElementById('openAssetModal').addEventListener('click', () => {
+        aModal.classList.remove('hidden');
+        setTimeout(() => {
+            aBox.classList.remove('scale-95', 'opacity-0');
+            aBox.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    });
+
+    function closeAssetModal() {
+        aBox.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => { aModal.classList.add('hidden'); }, 300);
+    }
+
+    function openAssetDrawer(id) {
+        document.getElementById('drawerTitle').innerText = 'Asset Details';
+        document.getElementById('drawerMeta').innerText = 'Manage owners for this asset';
+        document.getElementById('assetDrawer').classList.remove('hidden');
+    }
+
+    function closeAssetDrawer() {
+        document.getElementById('assetDrawer').classList.add('hidden');
+    }
+
+    document.getElementById('openOwnerModal').onclick = () => ownerModal.classList.remove('hidden');
+    function closeOwnerModal() { ownerModal.classList.add('hidden'); }
+</script>
+
+{% endblock %}
