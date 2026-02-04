@@ -1,0 +1,118 @@
+{% extends 'lineage/base.html' %}
+
+{% block title %}{{ parent.name }} - Details{% endblock %}
+
+{% block content %}
+<div class="max-w-[95%] mx-auto transition-all duration-500 animate-in px-4">
+
+    <div class="mb-10">
+        <a href="{% url 'parents' %}" class="group text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 flex items-center gap-2 mb-6 transition-all font-medium">
+            <i class="fas fa-arrow-left text-sm group-hover:-translate-x-1 transition-transform"></i> Back to Parents
+        </a>
+        <div class="flex justify-between items-end bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-700 shadow-sm">
+            <div>
+                <h1 class="text-5xl font-black text-slate-900 dark:text-slate-200 tracking-tight">{{ parent.name }}</h1>
+                <p class="text-slate-500 dark:text-slate-400 mt-3 flex items-center gap-3 text-lg">
+                    <span class="bg-slate-100 dark:bg-slate-800 p-2 rounded-lg"><i class="fas fa-calendar-alt text-indigo-500 dark:text-indigo-400"></i></span> 
+                    Born: <span class="font-semibold text-slate-700 dark:text-slate-200">{{ parent.birth_date|date:"F d, Y" }}</span>
+                </p>
+            </div>
+            <div class="text-right">
+                <span class="bg-indigo-600 dark:bg-indigo-500 text-white px-6 py-2 rounded-2xl text-sm font-bold shadow-lg shadow-indigo-100 dark:shadow-indigo-800">
+                    {{ children|length }} Children Records
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-4 gap-10">
+
+        <div class="xl:col-span-1">
+            <div class="bg-white dark:bg-slate-900 p-8 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 sticky top-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="h-10 w-10 bg-indigo-50 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-200 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 dark:text-slate-200">Add New Child</h3>
+                </div>
+                
+                <form method="post" class="space-y-5">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 dark:text-slate-200 mb-2 ml-1">{{ field.label }}</label>
+                        <div class="relative">
+                            {{ field }}
+                        </div>
+                        {% if field.errors %}
+                            <p class="text-red-500 text-xs mt-2 bg-red-50 dark:bg-red-900 p-2 rounded-lg border border-red-100 dark:border-red-700">{{ field.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    
+                    <button type="submit" 
+                        class="w-full bg-indigo-600 dark:bg-indigo-500 text-white px-4 py-4 rounded-2xl font-black text-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 mt-4 active:scale-95">
+                        Add Child Record
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="xl:col-span-3">
+            <div class="bg-white dark:bg-slate-900 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden min-h-[600px]">
+                <div class="px-10 py-8 border-b border-slate-50 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 flex justify-between items-center">
+                    <h3 class="font-black text-2xl text-slate-800 dark:text-slate-200 tracking-tight">Linked Records</h3>
+                    <div class="flex gap-2">
+                        <div class="h-3 w-3 rounded-full bg-green-400 animate-pulse"></div>
+                        <div class="h-3 w-3 rounded-full bg-slate-200 dark:bg-slate-600"></div>
+                        <div class="h-3 w-3 rounded-full bg-slate-200 dark:bg-slate-600"></div>
+                    </div>
+                </div>
+
+                <div class="divide-y divide-slate-50 dark:divide-slate-700">
+                    {% for child in children %}
+                    <div class="p-8 flex justify-between items-center hover:bg-indigo-50/40 dark:hover:bg-indigo-900/40 transition-all group border-l-4 border-transparent hover:border-indigo-500">
+                        <div class="flex items-center gap-6">
+                            <div class="h-16 w-16 bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-200 rounded-2xl flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white group-hover:rotate-6 transition-all duration-300 shadow-sm">
+                                <i class="fas fa-child text-2xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-black text-2xl text-slate-800 dark:text-slate-200 group-hover:text-indigo-900 dark:group-hover:text-indigo-300 transition-colors">{{ child.name }}</h4>
+                                <div class="flex items-center gap-4 mt-1">
+                                    <span class="text-slate-500 dark:text-slate-400 font-medium italic"><i class="far fa-calendar-alt mr-2"></i>Birth Year: {{ child.birth_date|date:"Y" }}</span>
+                                    <span class="h-1 w-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
+                                    <span class="text-indigo-400 dark:text-indigo-300 text-sm font-bold uppercase tracking-widest">ID: #00{{ forloop.counter }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-4">
+                            <button class="opacity-0 group-hover:opacity-100 h-12 w-12 rounded-xl bg-white dark:bg-slate-800 text-red-400 hover:bg-red-500 hover:text-white dark:hover:bg-red-600 shadow-sm border border-slate-100 dark:border-slate-700 transition-all duration-300">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="p-24 text-center">
+                        <div class="inline-flex items-center justify-center w-24 h-24 bg-slate-50 dark:bg-slate-800 text-slate-200 dark:text-slate-500 rounded-[2rem] mb-6">
+                            <i class="fas fa-users-slash text-5xl"></i>
+                        </div>
+                        <p class="text-slate-400 dark:text-slate-500 text-xl font-medium italic">No children registered under this parent yet.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes slideInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-in {
+        animation: slideInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+</style>
+{% endblock %}

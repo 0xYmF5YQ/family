@@ -3,70 +3,69 @@
 {% block title %}Parents{% endblock %}
 
 {% block content %}
-<div class="transition-all duration-500 ease-out">
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-slate-800">Manage Parents</h2>
+<div class="transition-all duration-500 ease-out max-w-[95%] mx-auto px-4">
+
+    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-200">Manage Parents</h2>
         <button id="openModalBtn"
-            class="bg-indigo-600 text-white px-6 py-2 rounded-xl font-medium hover:bg-indigo-700 transition flex items-center gap-2 shadow-lg shadow-indigo-100">
+            class="bg-indigo-600 dark:bg-indigo-500 text-white px-6 py-2 rounded-xl font-medium hover:bg-indigo-700 dark:hover:bg-indigo-600 transition flex items-center gap-2 shadow-lg shadow-indigo-100 dark:shadow-indigo-800">
             <i class="fas fa-plus text-sm"></i> Add Parent
         </button>
     </div>
 
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-8">
-        <h3 class="text-xl font-bold text-slate-800 mb-6 border-b pb-4">Current Parents</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-indigo-600 dark:bg-indigo-500 rounded-2xl p-6 shadow-xl shadow-indigo-100 dark:shadow-indigo-800 flex items-center gap-5 text-white relative overflow-hidden group">
+            <div class="absolute -right-4 -top-4 bg-white/10 dark:bg-white/20 w-20 h-20 rounded-full transition-transform group-hover:scale-150 duration-700"></div>
+            
+            <div class="h-14 w-14 bg-white/20 dark:bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center text-2xl z-10">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <div class="z-10">
+                <p class="text-indigo-100 dark:text-indigo-200 font-medium uppercase tracking-wider text-[10px]">Total Parents</p>
+                <h3 class="text-3xl font-black">{{ all_parents|length }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-6 mb-8">
+        <h3 class="text-xl font-bold text-slate-800 dark:text-slate-200 mb-6 border-b pb-4">Current Parents</h3>
 
         {% if all_parents %}
         <ul class="space-y-4">
             {% for parent in all_parents %}
             <li class="relative pl-8 transition-all duration-300 hover:translate-x-1">
-                <div class="absolute left-0 top-0 h-full w-px bg-slate-200"></div>
-                <div
-                    class="absolute left-0 top-0 h-4 w-4 bg-indigo-600 rounded-full flex items-center justify-center text-white text-xs z-10">
+                <div class="absolute left-0 top-0 h-full w-px bg-slate-200 dark:bg-slate-700"></div>
+                <div class="absolute left-0 top-0 h-4 w-4 bg-indigo-600 rounded-full flex items-center justify-center text-white text-xs z-10">
                     <i class="fas fa-user-tie"></i>
                 </div>
 
-                <div
-                    class="bg-indigo-50 p-4 rounded-xl flex justify-between items-center shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer">
+                <div class="bg-indigo-50 dark:bg-indigo-800/20 p-4 rounded-xl flex justify-between items-center shadow-sm hover:shadow-md transition-all duration-300">
                     <div>
-                        <p class="font-bold text-lg text-indigo-800">{{ parent.name }}</p>
-                        <p class="text-sm text-indigo-600">Born: {{ parent.birth_date|date:"F d, Y" }}</p>
+                        <p class="font-bold text-lg text-indigo-800 dark:text-indigo-100">{{ parent.name }}</p>
+                        <p class="text-sm text-indigo-600 dark:text-indigo-300">Born: {{ parent.birth_date|date:"F d, Y" }}</p>
                     </div>
-                    <button class="text-sm text-indigo-500 hover:text-indigo-700 font-medium">
+                    <a href="{% url 'parent_detail' parent.id %}" 
+                        class="text-sm text-indigo-500 dark:text-indigo-200 hover:text-indigo-700 dark:hover:text-indigo-400 font-medium">
                         View Details <i class="fas fa-chevron-right ml-1 text-xs"></i>
-                    </button>
+                    </a>
                 </div>
-
-                {% if parent.children.all %}
-                <ul class="ml-8 mt-4 space-y-3 border-l pl-4 border-slate-100">
-                    <p class="text-sm font-semibold text-slate-500 mb-2">Children:</p>
-                    {% for child in parent.children.all %}
-                    <li class="flex items-center gap-3 text-slate-700 hover:text-indigo-600 transition">
-                        <i class="fas fa-child text-sm text-slate-400"></i>
-                        <span class="font-medium">{{ child.name }} (Born: {{ child.birth_date|date:"Y" }})</span>
-                    </li>
-                    {% endfor %}
-                </ul>
-                {% endif %}
             </li>
             {% endfor %}
         </ul>
         {% else %}
-        <p class="text-slate-500 italic p-4 text-center">
+        <p class="text-slate-500 dark:text-slate-400 italic p-4 text-center">
             No parents added yet. Use the "Add Parent" button to get started!
         </p>
         {% endif %}
     </div>
 </div>
 
-<!-- Modal -->
-<div id="addParentModal"
-    class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 hidden">
-    <div
-        class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md transform scale-95 opacity-0 transition-all duration-300"
-        id="modalBox">
+<!-- Add Parent Modal -->
+<div id="addParentModal" class="fixed inset-0 bg-gray-600 dark:bg-gray-800 bg-opacity-75 dark:bg-opacity-70 flex items-center justify-center z-50 hidden">
+    <div class="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-2xl w-full max-w-md transform scale-95 opacity-0 transition-all duration-300" id="modalBox">
         <div class="flex justify-between items-center mb-6">
-            <h3 class="text-2xl font-bold text-slate-800">Add New Parent</h3>
-            <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+            <h3 class="text-2xl font-bold text-slate-800 dark:text-slate-200">Add New Parent</h3>
+            <button id="closeModalBtn" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 text-2xl">&times;</button>
         </div>
         <form method="post" action="{% url 'parents' %}">
             {% csrf_token %}
@@ -74,7 +73,7 @@
                 {{ form.as_div }}
             </div>
             <button type="submit"
-                class="mt-8 w-full bg-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition shadow-lg shadow-indigo-100">
+                class="mt-8 w-full bg-indigo-600 dark:bg-indigo-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-indigo-700 dark:hover:bg-indigo-600 transition shadow-lg shadow-indigo-100 dark:shadow-indigo-800">
                 Save Parent
             </button>
         </form>
@@ -82,29 +81,24 @@
 </div>
 
 <script>
-    const modal = document.getElementById('addParentModal');
-    const modalBox = document.getElementById('modalBox');
+const modal = document.getElementById('addParentModal');
+const modalBox = document.getElementById('modalBox');
 
-    document.getElementById('openModalBtn').addEventListener('click', () => {
-        modal.classList.remove('hidden');
-        setTimeout(() => {
-            modalBox.classList.remove('scale-95', 'opacity-0');
-            modalBox.classList.add('scale-100', 'opacity-100');
-        }, 10);
-    });
+document.getElementById('openModalBtn').addEventListener('click', () => {
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+        modalBox.classList.remove('scale-95','opacity-0');
+        modalBox.classList.add('scale-100','opacity-100');
+    },10);
+});
 
-    document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+modal.addEventListener('click', (e)=> { if(e.target===modal) closeModal(); });
 
-    function closeModal() {
-        modalBox.classList.add('scale-95', 'opacity-0');
-        modalBox.classList.remove('scale-100', 'opacity-100');
-        setTimeout(() => {
-            modal.classList.add('hidden');
-        }, 300);
-    }
-
-    modal.addEventListener('click', function (event) {
-        if (event.target === this) closeModal();
-    });
+function closeModal() {
+    modalBox.classList.add('scale-95','opacity-0');
+    modalBox.classList.remove('scale-100','opacity-100');
+    setTimeout(()=>modal.classList.add('hidden'),300);
+}
 </script>
 {% endblock %}

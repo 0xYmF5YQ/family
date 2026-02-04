@@ -1,47 +1,59 @@
 from django import forms
-from .models import Person
+from .models import Parents, Children
 from .models import Contribution, Event
 from .models import Asset, Owner
 
 class ParentForm(forms.ModelForm):
     class Meta:
-        model = Person
+        model = Parents
         fields = ['name', 'birth_date', 'parent'] 
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500', 'placeholder': 'Full Name'}),
-            'birth_date': forms.DateInput(attrs={'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500', 'type': 'date'}),
-            'parent': forms.Select(attrs={'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500'}),
+            'name': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400',
+                'placeholder': 'Full Name'
+            }),
+            'birth_date': forms.DateInput(attrs={
+                'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400',
+                'type': 'date'
+            }),
+            'parent': forms.Select(attrs={
+                'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400'
+            }),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['parent'].queryset = Person.objects.filter(is_parent=True)
+
+        if self.instance.pk:
+            self.fields['parent'].queryset = Parents.objects.exclude(pk=self.instance.pk)
+        else:
+            self.fields['parent'].queryset = Parents.objects.all()
+
         self.fields['parent'].required = False 
         self.fields['parent'].label = "Parent (optional)"
 
+
 class ChildForm(forms.ModelForm):
     class Meta:
-        model = Person
+        model = Children
         fields = ['name', 'birth_date', 'parent']
 
         widgets = {
             'name': forms.TextInput(attrs={
-                'class': 'w-full pl-4 pr-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500',
+                'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400',
                 'placeholder': 'Enter full name'
             }),
             'birth_date': forms.DateInput(attrs={
                 'type': 'date',
-                'class': 'w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500'
+                'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400',
             }),
             'parent': forms.Select(attrs={
-                'class': 'w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500'
+                'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400',
             }),
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['parent'].queryset = Person.objects.filter(is_parent=True)
-        self.fields['parent'].empty_label = "Select parent"
+   
+
 
 class EventForm(forms.ModelForm):
     class Meta:
@@ -56,23 +68,23 @@ class EventForm(forms.ModelForm):
         ]
         widgets = {
             'title': forms.TextInput(attrs={
-                'class': 'w-full rounded-xl border-slate-300'
+                'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400'
             }),
             'type': forms.Select(attrs={
-                'class': 'w-full rounded-xl border-slate-300'
+                'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400'
             }),
             'family_name': forms.TextInput(attrs={
-                'class': 'w-full rounded-xl border-slate-300'
+                'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400'
             }),
             'location': forms.TextInput(attrs={
-                'class': 'w-full rounded-xl border-slate-300'
+                'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400'
             }),
             'date': forms.DateInput(attrs={
                 'type': 'date',
-                'class': 'w-full rounded-xl border-slate-300'
+                'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400'
             }),
             'goal_amount': forms.NumberInput(attrs={
-                'class': 'w-full rounded-xl border-slate-300',
+                'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400',
                 'min': 0
             }),
         }
@@ -83,14 +95,11 @@ class ContributionForm(forms.ModelForm):
         model = Contribution
         fields = ['event', 'member_name', 'amount']
         widgets = {
-            'event': forms.Select(attrs={
-                'class': 'w-full rounded-xl border-slate-300'
-            }),
             'member_name': forms.TextInput(attrs={
-                'class': 'w-full rounded-xl border-slate-300'
+                'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400'
             }),
             'amount': forms.NumberInput(attrs={
-                'class': 'w-full rounded-xl border-slate-300',
+                'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400',
                 'min': 0
             }),
         }
@@ -102,26 +111,26 @@ class AssetForm(forms.ModelForm):
         fields = ['title', 'category', 'valuation', 'location', 'size', 'description']
         widgets = {
             'title': forms.TextInput(attrs={
-                'class': 'w-full border border-slate-300 rounded-xl px-3 py-2 text-sm',
+                'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400',
                 'placeholder': 'Asset Name'
             }),
             'category': forms.Select(attrs={
-                'class': 'w-full border border-slate-300 rounded-xl px-3 py-2 text-sm'
+                'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400'
             }),
             'valuation': forms.NumberInput(attrs={
-                'class': 'w-full border border-slate-300 rounded-xl px-3 py-2 text-sm',
+                'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400',
                 'placeholder': 'Estimated Value in Ksh'
             }),
             'location': forms.TextInput(attrs={
-                'class': 'w-full border border-slate-300 rounded-xl px-3 py-2 text-sm',
+                'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400',
                 'placeholder': 'Location (if applicable)'
             }),
             'size': forms.TextInput(attrs={
-                'class': 'w-full border border-slate-300 rounded-xl px-3 py-2 text-sm',
+                'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400',
                 'placeholder': 'Size / Metric'
             }),
             'description': forms.Textarea(attrs={
-                'class': 'w-full border border-slate-300 rounded-xl px-3 py-2 text-sm',
+                'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400',
                 'rows': 3,
                 'placeholder': 'Optional description'
             }),
@@ -130,15 +139,15 @@ class AssetForm(forms.ModelForm):
 class OwnerForm(forms.ModelForm):
     class Meta:
         model = Owner
-        fields = ['asset', 'member_name', 'share']
+        fields = [ 'member_name', 'share']
         widgets = {
             'asset': forms.HiddenInput(),  
             'member_name': forms.TextInput(attrs={
-                'class': 'w-full border border-slate-300 rounded-xl px-3 py-2 text-sm',
-                'placeholder': 'Full Name of Member'
+                'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400',
+                'placeholder': 'Full Name'
             }),
             'share': forms.NumberInput(attrs={
-                'class': 'w-full border border-slate-300 rounded-xl px-3 py-2 text-sm',
+                'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400',
                 'placeholder': 'Contribution / Share Value'
             }),
         }

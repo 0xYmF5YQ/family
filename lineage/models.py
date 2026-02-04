@@ -2,24 +2,36 @@ from django.db import models
 from django.utils import timezone
 from django.db.models import Sum
 
-class Person(models.Model):
-    name = models.CharField(max_length=100)
-    birth_date = models.DateField()
-    
+class Parents(models.Model):
+    name = models.CharField(max_length=200)
+    gender = models.CharField(max_length=10, choices=[('M', 'Male'), ('F', 'Female')])
+    birth_date = models.DateField(null=True, blank=True)
     parent = models.ForeignKey(
-        'self', 
-        on_delete=models.SET_NULL, 
-        null=True, 
-        blank=True, 
-        related_name='children'
+        'self',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='descendants'
     )
-    is_parent = models.BooleanField(default=False)
-
-    class Meta:
-        verbose_name_plural = "People"
 
     def __str__(self):
         return self.name
+
+
+
+class Children(models.Model):
+    
+    parent = models.ForeignKey(Parents, on_delete=models.CASCADE, related_name='children')
+    name = models.CharField(max_length=100)
+    birth_date = models.DateField()
+
+    class Meta:
+        verbose_name_plural = "Children"
+
+    def __str__(self):
+        return f"{self.name} (Child of {self.parent.name})"
+    
+
 
 class Event(models.Model):
     EVENT_TYPES = [
@@ -38,6 +50,17 @@ class Event(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.family_name})"
+
+    @property
+    def total_contributed(self):
+        result = self.contributions.aggregate(total=Sum('amount'))['total']
+        return result or 0
+    @property
+    def is_past(self):
+        from django.utils import timezone
+        return self.date < timezone.now().date()
+
+
 
 class Contribution(models.Model):
     event = models.ForeignKey(Event, related_name='contributions', on_delete=models.CASCADE)

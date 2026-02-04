@@ -1,0 +1,104 @@
+{% extends 'lineage/base.html' %}
+{% block title %}{{ child.name }}'s Profile{% endblock %}
+
+{% block content %}
+<div class="max-w-[95%] mx-auto py-8 transition-all duration-700 animate-in px-4">
+
+    <div class="mb-8">
+        <a href="{% url 'children' %}" class="group inline-flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium">
+            <i class="fas fa-chevron-left group-hover:-translate-x-1 transition-transform"></i> Back to Directory
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-4 gap-10">
+
+        <div class="xl:col-span-1">
+            <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-10 shadow-sm border border-slate-100 dark:border-slate-700 text-center sticky top-8">
+                <div class="w-32 h-32 bg-indigo-600 dark:bg-indigo-500 text-white rounded-[2rem] flex items-center justify-center text-5xl mx-auto mb-6 shadow-2xl shadow-indigo-200 dark:shadow-indigo-800 rotate-3 group hover:rotate-0 transition-transform duration-500">
+                    <i class="fas fa-child"></i>
+                </div>
+                <h1 class="text-3xl font-black text-slate-900 dark:text-slate-200 tracking-tight">{{ child.name }}</h1>
+                <p class="text-slate-500 dark:text-slate-400 mt-2 text-lg">Born {{ child.birth_date|date:"F d, Y" }}</p>
+
+                <div class="mt-8 pt-8 border-t border-slate-50 dark:border-slate-700">
+                    <span class="inline-block px-4 py-2 bg-indigo-50 dark:bg-indigo-800 text-indigo-700 dark:text-indigo-200 rounded-xl text-xs font-black uppercase tracking-widest">
+                        Child Record #{{ child.id }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="xl:col-span-3 space-y-8">
+
+            <div class="bg-indigo-900 dark:bg-indigo-800 text-white rounded-[2.5rem] p-10 shadow-2xl shadow-indigo-100 dark:shadow-indigo-700 relative overflow-hidden group">
+                <div class="relative z-10">
+                    <h3 class="text-indigo-300 dark:text-indigo-200 uppercase text-xs font-black tracking-[0.2em] mb-4">Primary Parent / Guardian</h3>
+                    {% if parent %}
+                        <div class="flex flex-col md:flex-row items-end justify-between gap-4">
+                            <div>
+                                <p class="text-5xl font-black tracking-tight mb-2">{{ parent.name }}</p>
+                                <p class="text-indigo-300 dark:text-indigo-200 text-lg flex items-center gap-2">
+                                    <i class="fas fa-history text-sm"></i> Registered: {{ parent.birth_date|date:"Y" }}
+                                </p>
+                            </div>
+                            <a href="{% url 'parent_detail' parent.id %}" class="bg-white/10 dark:bg-white/20 hover:bg-white/20 dark:hover:bg-white/30 backdrop-blur-md text-white dark:text-white px-6 py-3 rounded-2xl font-bold transition-all flex items-center gap-3 group">
+                                View Full Parent Profile
+                                <i class="fas fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                            </a>
+                        </div>
+                    {% else %}
+                        <p class="text-2xl italic text-indigo-300 dark:text-indigo-200">No parent assigned to this record.</p>
+                    {% endif %}
+                </div>
+                <i class="fas fa-user-tie absolute -bottom-8 -right-8 text-[12rem] text-white/5 dark:text-white/10 group-hover:scale-110 transition-transform duration-700"></i>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-10 shadow-sm border border-slate-100 dark:border-slate-700">
+                <div class="flex items-center justify-between mb-8">
+                    <h3 class="text-slate-800 dark:text-slate-200 text-2xl font-black tracking-tight flex items-center gap-3">
+                        <span class="h-10 w-10 bg-indigo-50 dark:bg-indigo-800 text-indigo-500 dark:text-indigo-200 rounded-xl flex items-center justify-center text-sm">
+                            <i class="fas fa-users"></i>
+                        </span>
+                        Family Siblings
+                    </h3>
+                    <span class="text-slate-400 dark:text-slate-500 font-bold text-sm uppercase tracking-widest">{{ siblings|length }} Registered</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {% for sibling in siblings %}
+                    <div class="group flex justify-between items-center p-6 bg-slate-50 dark:bg-slate-800 border border-transparent rounded-[1.5rem] hover:bg-white dark:hover:bg-slate-700 hover:border-indigo-100 hover:shadow-xl transition-all duration-300">
+                        <div class="flex items-center gap-4">
+                            <div class="h-12 w-12 bg-white dark:bg-slate-700 text-slate-400 dark:text-slate-300 rounded-xl flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                                <i class="fas fa-child"></i>
+                            </div>
+                            <div>
+                                <span class="block font-bold text-lg text-slate-800 dark:text-slate-200 group-hover:text-indigo-900 dark:group-hover:text-indigo-300">{{ sibling.name }}</span>
+                                <span class="text-xs text-slate-400 dark:text-slate-500 font-medium">Sibling Record</span>
+                            </div>
+                        </div>
+                        <a href="{% url 'child_detail' sibling.id %}" class="px-5 py-2 bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-200 rounded-xl text-xs font-black uppercase tracking-wider shadow-sm border border-slate-100 dark:border-slate-700 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500 dark:hover:text-white transition-all">
+                            Switch Profile
+                        </a>
+                    </div>
+                    {% empty %}
+                    <div class="col-span-full p-12 text-center bg-slate-50/50 dark:bg-slate-800/50 rounded-[2rem] border border-dashed border-slate-200 dark:border-slate-700">
+                        <div class="text-slate-200 dark:text-slate-500 mb-4"><i class="fas fa-users-slash text-5xl"></i></div>
+                        <p class="text-slate-400 dark:text-slate-500 italic text-lg font-medium">This child has no other registered siblings in the system.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes slideInUp {
+        from { opacity: 0; transform: translateY(40px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-in {
+        animation: slideInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+</style>
+{% endblock %}
