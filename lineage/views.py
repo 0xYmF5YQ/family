@@ -17,19 +17,62 @@ from django.utils.timesince import timesince
 def login(request):
     return redirect('dashboard')
 
+
 def dashboard(request):
     total_parents = Parents.objects.count()
     total_children = Children.objects.count()
     total_assets = Asset.objects.count()
     upcoming_event = Event.objects.filter(date__gte=timezone.now()).order_by('date').first()
-    recent_contribs = Contribution.objects.all().order_by('-created_at')[:5]
-    recent_assets = Asset.objects.all().order_by('-created_at')[:5]
-    recent_children = Children.objects.all().order_by('-id')
-    combined_activities = sorted(
-        chain(recent_contribs, recent_assets, recent_children),
-        key=attrgetter('created_at'),
-        reverse=True
-    )
+
+    recent_contribs = Contribution.objects.select_related('event').all().order_by('-created_at')
+    recent_assets = Asset.objects.all().order_by('-created_at')
+    recent_children = Children.objects.select_related('parent').all().order_by('-created_at')
+    recent_parents = Parents.objects.all().order_by('-created_at')
+
+    combined_activities = []
+    for c in recent_contribs:
+        combined_activities.append({
+            'type': 'contribution',
+            'name': c.member_name,
+            'amount': c.amount,
+            'event_name': c.event.title if c.event else '',
+            'asset_name': '',
+            'location': '',
+            'created_at': c.created_at,
+        })
+    for a in recent_assets:
+        combined_activities.append({
+            'type': 'asset',
+            'name': '',
+            'amount': None,
+            'event_name': '',
+            'asset_name': a.title,
+            'location': a.location or 'Unknown',
+            'created_at': a.created_at,
+        })
+    for ch in recent_children:
+        combined_activities.append({
+            'type': 'child',
+            'name': ch.name,
+            'amount': None,
+            'event_name': '',
+            'asset_name': '',
+            'location': ch.parent.name if ch.parent else 'Unknown',
+            'created_at': ch.created_at,
+        })
+    for p in recent_parents:
+        combined_activities.append({
+            'type': 'parent',
+            'name': p.name,
+            'amount': None,
+            'event_name': '',
+            'asset_name': '',
+            'location': '',
+            'created_at': p.created_at,
+        })
+
+    combined_activities.sort(key=lambda x: x['created_at'], reverse=True)
+
     recent_activities = combined_activities[:5]
 
     context = {
@@ -39,83 +82,89 @@ def dashboard(request):
         'upcoming_event': upcoming_event,
         'recent_activities': recent_activities,
     }
-    
+
     return render(request, 'lineage/dashboard.html', context)
-
-def dashboard_activities_json(request, page):
-    recent_contribs = Contribution.objects.all().order_by('-created_at')
-    recent_assets = Asset.objects.all().order_by('-created_at')
-    recent_children = Children.objects.all().order_by('-created_at')
-
-    combined_activities = sorted(
-        chain(recent_contribs, recent_assets, recent_children),
-        key=attrgetter('created_at'),
-        reverse=True
-    )
-
-    paginator = Paginator(combined_activities, 8)
-    page_obj = paginator.get_page(page)
-
-    data = []
-    for activity in page_obj:
-        if isinstance(activity, Contribution):
-            data.append({
-                'type': 'contribution',
-                'member_name': activity.member_name,
-                'amount': float(activity.amount),
-                'event_name': activity.event.title if activity.event else None,
-                'created_at': activity.created_at.strftime('%b %d, %Y'),
-            })
-        elif isinstance(activity, Asset):
-            data.append({
-                'type': 'asset',
-                'asset_name': activity.title,
-                'valuation': float(activity.valuation),
-                'created_at': activity.created_at.strftime('%b %d, %Y'),
-            })
-        elif isinstance(activity, Children):
-            data.append({
-                'type': 'child',
-                'child_name': activity.name,
-                'parent_name': activity.parent.name if activity.parent else None,
-                'created_at': activity.created_at.strftime('%b %d, %Y'),
-            })
-
-    return JsonResponse({'activities': data, 'has_next': page_obj.has_next()})
 
 
 def recent_activities_api(request):
-    page = request.GET.get('page', 1)
-    activities = Contribution.objects.order_by('-created_at')  
-    paginator = Paginator(activities, 10)  
-    page_obj = paginator.get_page(page)
+    page = int(request.GET.get('page', 1))
+    per_page = 8
+    recent_contribs = Contribution.objects.select_related('event').all().order_by('-created_at')
+    recent_assets = Asset.objects.all().order_by('-created_at')
+    recent_children = Children.objects.select_related('parent').all().order_by('-created_at')
+    recent_parents = Parents.objects.order_by('-created_at')
 
-    activity_list = []
-    for act in page_obj:
-        
-        if hasattr(act, 'amount') and act.amount:
-            type_ = 'payment'
-        elif hasattr(act, 'asset_name') and act.asset_name:
-            type_ = 'asset'
-        elif hasattr(act, 'child_name') and act.child_name:
-            type_ = 'child'
-        else:
-            type_ = 'other'
+    combined_activities = []
 
-        activity_list.append({
-            'id': act.id,
-            'type': type_,
-            'user_name': getattr(act.user, 'get_full_name', lambda: getattr(act.user, 'username', 'System'))() if getattr(act, 'user', None) else 'System',
-            'amount': getattr(act, 'amount', None),
-            'event_name': getattr(act, 'event_name', ''),
-            'asset_name': getattr(act, 'asset_name', ''),
-            'asset_value': getattr(act, 'asset_value', 0),
-            'child_name': getattr(act, 'child_name', ''),
-            'parent_name': getattr(act, 'parent_name', ''),
-            'time_since': timesince(act.created_at),
+    for c in recent_contribs:
+        combined_activities.append({
+            'type': 'contribution',
+            'name': c.member_name,
+            'amount': float(c.amount),
+            'event_name': c.event.title if c.event else '',
+            'asset_name': '',
+            'location': '',
+            'created_at': c.created_at,
         })
 
-    return JsonResponse({'activities': activity_list})
+    for a in recent_assets:
+        combined_activities.append({
+            'type': 'asset',
+            'name': '',
+            'amount': None,
+            'event_name': '',
+            'asset_name': a.title,
+            'location': a.location or 'Unknown',
+            'created_at': a.created_at,
+        })
+
+    for ch in recent_children:
+        combined_activities.append({
+            'type': 'child',
+            'name': ch.name,
+            'amount': None,
+            'event_name': '',
+            'asset_name': '',
+            'location': ch.parent.name if ch.parent else 'Unknown',
+            'created_at': ch.created_at,
+        })
+    for p in recent_parents:
+        combined_activities.append({
+            'type': 'parent',
+            'name': p.name,
+            'amount': None,
+            'event_name': '',
+            'asset_name': '',
+            'location': '',
+            'created_at': p.created_at,
+        })
+   
+    combined_activities.sort(key=lambda x: x['created_at'], reverse=True)
+
+   
+    start = (page - 1) * per_page
+    end = start + per_page
+    page_activities = combined_activities[start:end]
+    has_next = len(combined_activities) > end
+
+   
+    activity_list = []
+    for act in page_activities:
+        activity_list.append({
+            'type': act['type'],
+            'name': act['name'],
+            'amount': act['amount'],
+            'event_name': act['event_name'],
+            'asset_name': act['asset_name'],
+            'location': act['location'],
+            'time_since': timesince(act['created_at']),
+        })
+
+    return JsonResponse({
+        'activities': activity_list,
+        'has_next': has_next,
+    })
+
 
 
 def parent(request):

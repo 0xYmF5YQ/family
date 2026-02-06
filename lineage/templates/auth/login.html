@@ -1,99 +1,150 @@
 {% extends 'auth/base_auth.html' %}
-
+{% load static %}
 {% block title %}Sign In | Usunye Family{% endblock %}
 
 {% block content %}
-<div class="min-h-screen flex items-center justify-center p-4 sm:p-6 animate__animated animate__fadeIn">
+<div id="parallax-container" class="min-h-screen flex items-center justify-center p-4 sm:p-6 relative overflow-hidden bg-slate-900">
     
-    <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] sm:rounded-[3rem] shadow-2xl w-full max-w-md overflow-hidden border border-slate-100 dark:border-slate-800 animate__animated animate__slideInUp animate__fast">
+    <div id="parallax-bg" 
+        class="absolute inset-0 z-0 scale-110 bg-cover bg-center transition-transform duration-200 ease-out" 
+        style="background-color: #4cd2e4; background-image: url(&quot;{% static 'images/family-bg.jpg' %}&quot;);">
+    </div>
 
-        <!-- HEADER -->
-        <div class="bg-indigo-600 p-10 text-white text-center relative overflow-hidden">
-            <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl animate-pulse"></div>
-            
-            <h2 class="text-3xl font-black uppercase tracking-tighter relative z-10 animate__animated animate__fadeInDown animate__delay-1s">
-                Welcome Back
-            </h2>
-            <p class="text-indigo-100 text-[10px] sm:text-xs font-bold opacity-80 uppercase mt-2 tracking-widest relative z-10 animate__animated animate__fadeIn animate__delay-1s">
-                Usunye Family
-            </p>
-        </div>
+    <div class="absolute inset-0 z-10 bg-slate-900/40 backdrop-blur-[3px]"></div>
 
-        {% if messages %}
-        <div id="toast-container" class="p-4 space-y-2">
-            {% for message in messages %}
-            <div class="toast rounded-2xl px-4 py-3 text-sm font-bold transition-opacity duration-500
-                        {% if message.tags == 'success' %}bg-green-100 text-green-800
-                        {% elif message.tags == 'error' %}bg-rose-100 text-rose-800
-                        {% else %}bg-indigo-100 text-indigo-800{% endif %} 
-                        animate__animated animate__fadeIn">
-                {{ message }}
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
+    <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-[2.5rem] shadow-2xl w-full max-w-4xl flex flex-col md:flex-row overflow-hidden border border-white/20 dark:border-slate-800 animate__animated animate__fadeInUp animate__fast relative z-20">
+        
+        <div class="md:w-5/12 bg-gradient-to-br from-indigo-600/90 to-violet-700/90 p-10 flex flex-col items-center justify-center text-center text-white relative overflow-hidden">
+            <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-400/20 rounded-full blur-2xl animate-bounce" style="animation-duration: 8s;"></div>
 
-        <!-- LOGIN FORM -->
-        <form method="post" class="p-8 sm:p-10 space-y-6">
-            {% csrf_token %}
-            
-            <div class="group animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
-                <label class="text-[10px] font-black uppercase text-slate-400 mb-2 block tracking-widest group-focus-within:text-indigo-500 transition-colors">
-                    Username
-                </label>
-                <input 
-                    type="text" 
-                    name="username" 
-                    required
-                    class="w-full bg-slate-50 dark:bg-slate-800 text-sm p-4 rounded-2xl border border-indigo-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 dark:text-white transition-all duration-300 outline-none hover:bg-slate-100 dark:hover:bg-slate-700"
-                >
-            </div>
-
-            <div class="group animate__animated animate__fadeInUp" style="animation-delay: 0.5s;">
-                <div class="flex justify-between items-center mb-2">
-                    <label class="text-[10px] font-black uppercase text-slate-400 block tracking-widest group-focus-within:text-indigo-500 transition-colors">
-                        Password
-                    </label>
-                    <a href="#" class="text-[9px] font-black uppercase text-indigo-400 hover:text-indigo-600 transition-colors tracking-tighter">Forgot Password?</a>
+            <div class="mb-6 relative z-10 animate__animated animate__zoomIn animate__delay-1s">
+                <div class="motion-safe:animate-bounce" style="animation-duration: 4s;">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 opacity-90 drop-shadow-2xl" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
                 </div>
-                <input 
-                    type="password" 
-                    name="password" 
-                    required
-                    class="w-full bg-slate-50 dark:bg-slate-800 text-sm p-4 rounded-2xl border border-indigo-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 dark:text-white transition-all duration-300 outline-none hover:bg-slate-100 dark:hover:bg-slate-700"
-                >
+            </div>
+            <h1 class="text-3xl font-black uppercase tracking-tighter relative z-10 animate__animated animate__fadeInUp" style="animation-delay: 0.5s;">Usunye Family</h1>
+            <p class="text-indigo-100 text-xs font-bold opacity-80 uppercase mt-2 tracking-widest relative z-10 animate__animated animate__fadeIn" style="animation-delay: 0.8s;">ASIMILANI</p>
+        </div>
+
+        <div class="md:w-7/12 p-8 md:p-14 flex flex-col justify-center">
+            <div class="mb-8 animate__animated animate__fadeInRight animate__faster">
+                <h2 class="text-3xl font-bold text-slate-800 dark:text-white tracking-tight">Welcome Back!</h2>
+                <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Sign in to continue to your dashboard.</p>
             </div>
 
-            <button 
-                type="submit" 
-                class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-indigo-700 active:scale-[0.98] transform transition-all duration-300 shadow-xl shadow-indigo-100 dark:shadow-none mt-4 hover:shadow-indigo-200 hover:-translate-y-1 animate__animated animate__zoomIn"
-                style="animation-delay: 0.7s;"
-            >
-                Sign In
-            </button>
+            {% if messages %}
+            <div id="toast-container" class="mb-6 space-y-2">
+                {% for message in messages %}
+                <div class="toast rounded-2xl px-4 py-3 text-sm font-bold animate__animated animate__fadeInUp
+                            {% if message.tags == 'success' %}bg-green-100 text-green-800
+                            {% elif message.tags == 'error' %}bg-rose-100 text-rose-800
+                            {% else %}bg-indigo-100 text-indigo-800{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
 
-            <p class="text-center text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-tight pt-2 animate__animated animate__fadeIn" style="animation-delay: 0.9s;">
-                Don't have an account? 
-                <a href="{% url 'signup' %}" class="text-indigo-600 hover:text-indigo-800 transition-colors underline-offset-4 hover:underline">
-                    Create Account
-                </a>
-            </p>
-        </form>
+            <form method="post" id="loginForm" class="space-y-6">
+                {% csrf_token %}
+                
+                <div class="group animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+                    <label class="text-[10px] font-black uppercase text-slate-400 mb-2 block tracking-widest group-focus-within:text-indigo-500 group-focus-within:translate-x-1 transition-all">Username</label>
+                    <input type="text" name="username" placeholder="Enter username" required class="w-full bg-slate-50/50 dark:bg-slate-800/50 backdrop-blur-sm text-sm p-4 rounded-2xl border border-indigo-50/50 dark:border-slate-700 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 dark:text-white transition-all duration-300 outline-none hover:bg-white dark:hover:bg-slate-750">
+                </div>
 
+                <div class="group animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-[10px] font-black uppercase text-slate-400 block tracking-widest group-focus-within:text-indigo-500 group-focus-within:translate-x-1 transition-all">Password</label>
+                        <a href="#" class="text-[9px] font-black uppercase text-indigo-500 hover:text-indigo-700">Forgot Password?</a>
+                    </div>
+                    <div class="relative">
+                        <input type="password" name="password" id="login_password" placeholder="••••••••" required class="w-full bg-slate-50/50 dark:bg-slate-800/50 backdrop-blur-sm text-sm p-4 pr-12 rounded-2xl border border-indigo-50/50 dark:border-slate-700 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 dark:text-white transition-all outline-none hover:bg-white dark:hover:bg-slate-750">
+                        <button type="button" onclick="togglePassword('login_password', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-indigo-500 transition-all hover:scale-110">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 eye-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="animate__animated animate__zoomIn" style="animation-delay: 0.5s;">
+                    <button type="submit" id="submitBtn" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-indigo-700 disabled:bg-indigo-400 disabled:cursor-not-allowed active:scale-95 transform transition-all duration-300 shadow-xl shadow-indigo-200 mt-2 group flex items-center justify-center space-x-3">
+                        <svg id="btnLoader" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span id="btnText">Sign In</span>
+                        <svg id="btnArrow" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                        </svg>
+                    </button>
+                </div>
+
+                <p class="text-center text-[11px] font-bold text-slate-400 uppercase tracking-tight pt-4 animate__animated animate__fadeIn" style="animation-delay: 0.7s;">
+                    Don't have an account? 
+                    <a href="{% url 'signup' %}" class="text-indigo-600 hover:text-indigo-800 font-black underline-offset-4 hover:underline">Create Account →</a>
+                </p>
+            </form>
+        </div>
     </div>
 </div>
 
-
 <script>
+
+const container = document.getElementById('parallax-container');
+const bg = document.getElementById('parallax-bg');
+
+container.addEventListener('mousemove', (e) => {
+    const { clientX, clientY } = e;
+    const { innerWidth, innerHeight } = window;
+    const moveX = (clientX / innerWidth - 0.5) * 30; 
+    const moveY = (clientY / innerHeight - 0.5) * 30;
+    
+    bg.style.transform = `scale(1.1) translate(${moveX}px, ${moveY}px)`;
+});
+
+function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector('.eye-icon');
+    btn.classList.add('rotate-12');
+    setTimeout(() => btn.classList.remove('rotate-12'), 150);
+    
+    if (input.type === "password") {
+        input.type = "text";
+        icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />`;
+    } else {
+        input.type = "password";
+        icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />`;
+    }
+}
+
+document.getElementById('loginForm').addEventListener('submit', function() {
+    const btn = document.getElementById('submitBtn');
+    const loader = document.getElementById('btnLoader');
+    const text = document.getElementById('btnText');
+    const arrow = document.getElementById('btnArrow');
+
+    btn.disabled = true;
+    loader.classList.remove('hidden');
+    arrow.classList.add('hidden');
+    text.innerText = "Authenticating...";
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     const toasts = document.querySelectorAll('#toast-container .toast');
     toasts.forEach(toast => {
         setTimeout(() => {
             toast.classList.add('opacity-0');
+            toast.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            toast.style.transform = 'translateY(-10px)';
             setTimeout(() => toast.remove(), 500);
-        }, 1000); 
+        }, 3000); 
     });
 });
 </script>
-
 {% endblock %}

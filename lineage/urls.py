@@ -8,8 +8,8 @@ urlpatterns = [
 
 
     path('dashboard/', views.dashboard, name='dashboard'),
-    path('dashboard/activities/json/<int:page>/', views.dashboard_activities_json, name='dashboard_activities_json'),
-     path('api/recent-activities/', views.recent_activities_api, name='recent_activities_api'),
+    #path('dashboard/activities/json/<int:page>/', views.dashboard_activities_json, name='dashboard_activities_json'),
+    path('api/recent-activities/', views.recent_activities_api, name='recent_activities_api'),
 
     path('parents/', views.parent, name='parents'),
     path('parents/<int:pk>/', views.parent_detail, name='parent_detail'),

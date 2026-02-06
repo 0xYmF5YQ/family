@@ -8,7 +8,7 @@
 
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b dark:border-slate-800 pb-8">
         <div>
-            <h2 class="text-4xl font-black text-slate-800 dark:text-white tracking-tighter uppercase">
+            <h2 class="text-2xl font-black text-slate-800 dark:text-white tracking-tighter uppercase">
                 Welcome, {{ request.user.username }}
             </h2>
             <p class="text-slate-500 dark:text-slate-400 font-bold uppercase text-xs tracking-widest mt-1">
@@ -69,7 +69,7 @@
                 <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
                     <div class="space-y-4">
                         <span class="px-4 py-1 bg-rose-500 text-[10px] font-black uppercase rounded-full">Primary Schedule</span>
-                        <h3 class="text-4xl font-black tracking-tighter uppercase">{{ upcoming_event.title }}</h3>
+                        <h3 class="text-2xl font-black tracking-tighter uppercase">{{ upcoming_event.title }}</h3>
                         <p class="text-slate-400 font-bold flex items-center gap-2">
                             <i class="fas fa-map-marker-alt text-rose-500"></i> {{ upcoming_event.location }}
                         </p>
@@ -97,23 +97,30 @@
                     <ul id="activity-list" class="divide-y divide-slate-50 dark:divide-slate-800">
                         {% for activity in recent_activities %}
                         <li class="p-5 flex items-start gap-4 activity-item"
-                            data-id="{{ activity.id }}"
-                            data-type="{% if activity.amount %}payment{% elif activity.asset_name %}asset{% elif activity.child_name %}child{% endif %}">
+                            data-type="{{ activity.type }}">
+                            
                             <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm
-                                {% if activity.amount %} bg-emerald-100 text-emerald-600 {% elif activity.asset_name %} bg-indigo-100 text-indigo-600 {% elif activity.child_name %} bg-blue-100 text-blue-600 {% else %} bg-gray-100 text-gray-600 {% endif %}">
-                                {% if activity.amount %}<i class="fas fa-money-bill-wave"></i>
-                                {% elif activity.asset_name %}<i class="fas fa-landmark"></i>
-                                {% elif activity.child_name %}<i class="fas fa-child"></i>
+                                {% if activity.type == 'contribution' %} bg-emerald-100 text-emerald-600 
+                                {% elif activity.type == 'asset' %} bg-indigo-100 text-indigo-600 
+                                {% elif activity.type == 'child' %} bg-blue-100 text-blue-600 
+                                {% else %} bg-gray-100 text-gray-600 {% endif %}">
+                                {% if activity.type == 'contribution' %}<i class="fas fa-money-bill-wave"></i>
+                                {% elif activity.type == 'asset' %}<i class="fas fa-landmark"></i>
+                                {% elif activity.type == 'child' %}<i class="fas fa-child"></i>
+                                {% elif activity.type == 'parent' %}<i class="fas fa-user-tie"></i>
                                 {% else %}<i class="fas fa-info"></i>{% endif %}
                             </div>
+                            
                             <div class="flex-1 text-[11px] font-bold">
-                               <p class="text-slate-800 dark:text-slate-200">
-                                    {% if activity.amount %}
-                                        {{ activity.user.get_full_name|default:"System" }} contributed Ksh {{ activity.amount|intcomma }} to {{ activity.event_name }}
-                                    {% elif activity.asset_name %}
-                                        New asset registered: {{ activity.asset_name }} (Ksh {{ activity.asset_value|intcomma }})
-                                    {% elif activity.child_name %}
-                                        Child added: {{ activity.child_name }} (Parent: {{ activity.parent_name }})
+                                <p class="text-slate-800 dark:text-slate-200">
+                                    {% if activity.type == 'contribution' %}
+                                        {{ activity.name }} contributed Ksh {{ activity.amount|intcomma }} to {{ activity.event_name }}
+                                    {% elif activity.type == 'asset' %}
+                                        Asset added: {{ activity.asset_name }} (Location: {{ activity.location }})
+                                    {% elif activity.type == 'child' %}
+                                        Child added: {{ activity.name }} (Parent: {{ activity.location }})
+                                    {% elif activity.type == 'parent' %}
+                                        Parent added: {{ activity.name }}
                                     {% endif %}
                                 </p>
                                 <p class="text-slate-400 text-[9px] mt-0.5">
@@ -125,6 +132,7 @@
                         <li class="p-10 text-center text-slate-400 text-xs font-bold uppercase italic">No recent updates.</li>
                         {% endfor %}
                     </ul>
+
                     <div id="loading" class="p-5 text-center text-slate-400 hidden">
                         <i class="fas fa-circle-notch fa-spin"></i>
                     </div>
@@ -173,18 +181,22 @@ container.addEventListener('scroll', async () => {
                 let bgClass = '';
                 let text = '';
 
-                if(activity.type === 'payment') {
+                if(activity.type === 'contribution') {
                     iconClass = 'fas fa-money-bill-wave';
                     bgClass = 'bg-emerald-100 text-emerald-600';
-                    text = `${activity.user_name} contributed Ksh ${activity.amount} to ${activity.event_name}`;
+                    text = `${activity.member_name} contributed Ksh ${activity.amount} to ${activity.event_name}`;
                 } else if(activity.type === 'asset') {
                     iconClass = 'fas fa-landmark';
                     bgClass = 'bg-indigo-100 text-indigo-600';
-                    text = `New asset registered: ${activity.asset_name} (Ksh ${activity.asset_value})`;
+                    text = `Asset added: ${activity.asset_name} (Ksh ${activity.asset_value} at ${activity.asset_location})`;
                 } else if(activity.type === 'child') {
                     iconClass = 'fas fa-child';
                     bgClass = 'bg-blue-100 text-blue-600';
                     text = `Child added: ${activity.child_name} (Parent: ${activity.parent_name})`;
+                } else if(activity.type === 'parent') {
+                    iconClass = 'fas fa-user-tie';
+                    bgClass = 'bg-purple-100 text-purple-600';
+                    text = `Parent added: ${activity.name}`;
                 }
 
                 li.innerHTML = `

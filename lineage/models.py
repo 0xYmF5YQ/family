@@ -8,6 +8,7 @@ class Parents(models.Model):
     name = models.CharField(max_length=200)
     gender = models.CharField(max_length=10, choices=[('M', 'Male'), ('F', 'Female')])
     birth_date = models.DateField(null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
     parent = models.ForeignKey(
         'self',
         null=True,
