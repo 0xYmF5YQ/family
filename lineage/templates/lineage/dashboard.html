@@ -1,12 +1,11 @@
 {% extends 'lineage/base.html' %}
 {% load humanize %}
 
-{% block title %}Dashboard | Family Lineage{% endblock %}
+{% block title %}Dashboard | Usunye Family{% endblock %}
 
 {% block content %}
-<div class="animate__animated animate__fadeIn space-y-10 max-w-[95%] mx-auto">
+<div class="animate__animated animate__fadeIn space-y-10 max-w-[95%] mx-auto pb-10">
 
-    <!-- Dashboard Overview Cards -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b dark:border-slate-800 pb-8">
         <div>
             <h2 class="text-4xl font-black text-slate-800 dark:text-white tracking-tighter uppercase">
@@ -24,7 +23,6 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <!-- Total Parents -->
         <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-xl flex items-center gap-6">
             <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 text-blue-600 rounded-3xl flex items-center justify-center text-3xl">
                 <i class="fas fa-users"></i>
@@ -35,7 +33,6 @@
             </div>
         </div>
 
-        <!-- Total Children -->
         <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-xl flex items-center gap-6">
             <div class="w-16 h-16 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 rounded-3xl flex items-center justify-center text-3xl">
                 <i class="fas fa-child"></i>
@@ -46,7 +43,6 @@
             </div>
         </div>
 
-        <!-- Active Assets -->
         <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-xl flex items-center gap-6">
             <div class="w-16 h-16 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 rounded-3xl flex items-center justify-center text-3xl">
                 <i class="fas fa-vault"></i>
@@ -58,10 +54,8 @@
         </div>
     </div>
 
-    <!-- Main Content Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-        <!-- Next Major Event -->
         <div class="lg:col-span-2 space-y-8">
             <h4 class="text-xl font-black text-slate-800 dark:text-white uppercase flex items-center gap-3">
                 <span class="w-2 h-8 bg-rose-500 rounded-full"></span> Next Major Event
@@ -93,76 +87,88 @@
             {% endif %}
         </div>
 
-        <!-- Recent Activity -->
         <div class="space-y-8">
             <h4 class="text-xl font-black text-slate-800 dark:text-white uppercase flex items-center gap-3">
                 <span class="w-2 h-8 bg-indigo-500 rounded-full"></span> Recent Activity
             </h4>
 
-            <div id="activity-container" class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-xl overflow-hidden">
-                <ul id="activity-list" class="divide-y divide-slate-50 dark:divide-slate-800">
-                    {% for activity in recent_activities %}
-                    <li class="p-5 flex items-start gap-4 activity-item"
-                        data-id="{{ activity.id }}"
-                        data-type="{% if activity.amount %}payment{% elif activity.asset_name %}asset{% elif activity.child_name %}child{% endif %}">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm
-                            {% if activity.amount %} bg-emerald-100 text-emerald-600 {% elif activity.asset_name %} bg-indigo-100 text-indigo-600 {% elif activity.child_name %} bg-blue-100 text-blue-600 {% else %} bg-gray-100 text-gray-600 {% endif %}">
-                            {% if activity.amount %}<i class="fas fa-money-bill-wave"></i>
-                            {% elif activity.asset_name %}<i class="fas fa-landmark"></i>
-                            {% elif activity.child_name %}<i class="fas fa-child"></i>
-                            {% else %}<i class="fas fa-info"></i>{% endif %}
-                        </div>
-                        <div class="flex-1 text-[11px] font-bold">
-                           <p class="text-slate-800 dark:text-slate-200">
-                                {% if activity.amount %}
-                                    {{ activity.user.get_full_name|default:"System" }} contributed Ksh {{ activity.amount|intcomma }} to {{ activity.event_name }}
-                                {% elif activity.asset_name %}
-                                    New asset registered: {{ activity.asset_name }} (Ksh {{ activity.asset_value|intcomma }})
-                                {% elif activity.child_name %}
-                                    Child added: {{ activity.child_name }} (Parent: {{ activity.parent_name }})
-                                {% endif %}
-                            </p>
-                            <p class="text-slate-400 text-[9px] mt-0.5">
-                                {{ activity.created_at|timesince }} ago
-                            </p>
-                        </div>
-                    </li>
-                    {% empty %}
-                    <li class="p-10 text-center text-slate-400 text-xs font-bold uppercase italic">No recent updates.</li>
-                    {% endfor %}
-                </ul>
-                <div id="loading" class="p-5 text-center text-slate-400 hidden">Loading more...</div>
+            <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col">
+                <div id="activity-container" class="max-h-[500px] overflow-y-auto scroll-smooth">
+                    <ul id="activity-list" class="divide-y divide-slate-50 dark:divide-slate-800">
+                        {% for activity in recent_activities %}
+                        <li class="p-5 flex items-start gap-4 activity-item"
+                            data-id="{{ activity.id }}"
+                            data-type="{% if activity.amount %}payment{% elif activity.asset_name %}asset{% elif activity.child_name %}child{% endif %}">
+                            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm
+                                {% if activity.amount %} bg-emerald-100 text-emerald-600 {% elif activity.asset_name %} bg-indigo-100 text-indigo-600 {% elif activity.child_name %} bg-blue-100 text-blue-600 {% else %} bg-gray-100 text-gray-600 {% endif %}">
+                                {% if activity.amount %}<i class="fas fa-money-bill-wave"></i>
+                                {% elif activity.asset_name %}<i class="fas fa-landmark"></i>
+                                {% elif activity.child_name %}<i class="fas fa-child"></i>
+                                {% else %}<i class="fas fa-info"></i>{% endif %}
+                            </div>
+                            <div class="flex-1 text-[11px] font-bold">
+                               <p class="text-slate-800 dark:text-slate-200">
+                                    {% if activity.amount %}
+                                        {{ activity.user.get_full_name|default:"System" }} contributed Ksh {{ activity.amount|intcomma }} to {{ activity.event_name }}
+                                    {% elif activity.asset_name %}
+                                        New asset registered: {{ activity.asset_name }} (Ksh {{ activity.asset_value|intcomma }})
+                                    {% elif activity.child_name %}
+                                        Child added: {{ activity.child_name }} (Parent: {{ activity.parent_name }})
+                                    {% endif %}
+                                </p>
+                                <p class="text-slate-400 text-[9px] mt-0.5">
+                                    {{ activity.created_at|timesince }} ago
+                                </p>
+                            </div>
+                        </li>
+                        {% empty %}
+                        <li class="p-10 text-center text-slate-400 text-xs font-bold uppercase italic">No recent updates.</li>
+                        {% endfor %}
+                    </ul>
+                    <div id="loading" class="p-5 text-center text-slate-400 hidden">
+                        <i class="fas fa-circle-notch fa-spin"></i>
+                    </div>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-800/50 p-3 text-center border-t dark:border-slate-800">
+                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">5 Recent Updates</p>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-
 <script>
 let nextPage = 2;
 let loading = false;
+let hasMore = true; 
 
 const container = document.getElementById('activity-container');
 const list = document.getElementById('activity-list');
 const loadingIndicator = document.getElementById('loading');
 
-window.addEventListener('scroll', async () => {
-    if (loading) return;
-    if ((window.innerHeight + window.scrollY) >= container.offsetTop + container.offsetHeight - 200) {
+container.addEventListener('scroll', async () => {
+    if (loading || !hasMore) return;
+
+    const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 50;
+
+    if (isAtBottom) {
         loading = true;
         loadingIndicator.classList.remove('hidden');
+        
         try {
             const response = await fetch("{% url 'recent_activities_api' %}?page=" + nextPage);
             if (!response.ok) throw new Error('Network error');
             const data = await response.json();
-            if (data.activities.length === 0) return;
+            
+            if (data.activities.length === 0) {
+                hasMore = false;
+                return;
+            }
 
             data.activities.forEach(activity => {
                 const li = document.createElement('li');
-                li.className = 'p-5 flex items-start gap-4 activity-item';
-                li.dataset.id = activity.id;
-                li.dataset.type = activity.type;
-
+                li.className = 'p-5 flex items-start gap-4 activity-item border-t border-slate-50 dark:border-slate-800';
+                
                 let iconClass = '';
                 let bgClass = '';
                 let text = '';
@@ -195,7 +201,7 @@ window.addEventListener('scroll', async () => {
 
             nextPage++;
         } catch (err) {
-            console.error(err);
+            console.error("Scroll error:", err);
         } finally {
             loading = false;
             loadingIndicator.classList.add('hidden');
