@@ -1,0 +1,99 @@
+{% extends 'auth/base_auth.html' %}
+
+{% block title %}Sign In | Usunye Family{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center p-4 sm:p-6 animate__animated animate__fadeIn">
+    
+    <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] sm:rounded-[3rem] shadow-2xl w-full max-w-md overflow-hidden border border-slate-100 dark:border-slate-800 animate__animated animate__slideInUp animate__fast">
+
+        <!-- HEADER -->
+        <div class="bg-indigo-600 p-10 text-white text-center relative overflow-hidden">
+            <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl animate-pulse"></div>
+            
+            <h2 class="text-3xl font-black uppercase tracking-tighter relative z-10 animate__animated animate__fadeInDown animate__delay-1s">
+                Welcome Back
+            </h2>
+            <p class="text-indigo-100 text-[10px] sm:text-xs font-bold opacity-80 uppercase mt-2 tracking-widest relative z-10 animate__animated animate__fadeIn animate__delay-1s">
+                Usunye Family
+            </p>
+        </div>
+
+        {% if messages %}
+        <div id="toast-container" class="p-4 space-y-2">
+            {% for message in messages %}
+            <div class="toast rounded-2xl px-4 py-3 text-sm font-bold transition-opacity duration-500
+                        {% if message.tags == 'success' %}bg-green-100 text-green-800
+                        {% elif message.tags == 'error' %}bg-rose-100 text-rose-800
+                        {% else %}bg-indigo-100 text-indigo-800{% endif %} 
+                        animate__animated animate__fadeIn">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- LOGIN FORM -->
+        <form method="post" class="p-8 sm:p-10 space-y-6">
+            {% csrf_token %}
+            
+            <div class="group animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
+                <label class="text-[10px] font-black uppercase text-slate-400 mb-2 block tracking-widest group-focus-within:text-indigo-500 transition-colors">
+                    Username
+                </label>
+                <input 
+                    type="text" 
+                    name="username" 
+                    required
+                    class="w-full bg-slate-50 dark:bg-slate-800 text-sm p-4 rounded-2xl border border-indigo-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 dark:text-white transition-all duration-300 outline-none hover:bg-slate-100 dark:hover:bg-slate-700"
+                >
+            </div>
+
+            <div class="group animate__animated animate__fadeInUp" style="animation-delay: 0.5s;">
+                <div class="flex justify-between items-center mb-2">
+                    <label class="text-[10px] font-black uppercase text-slate-400 block tracking-widest group-focus-within:text-indigo-500 transition-colors">
+                        Password
+                    </label>
+                    <a href="#" class="text-[9px] font-black uppercase text-indigo-400 hover:text-indigo-600 transition-colors tracking-tighter">Forgot Password?</a>
+                </div>
+                <input 
+                    type="password" 
+                    name="password" 
+                    required
+                    class="w-full bg-slate-50 dark:bg-slate-800 text-sm p-4 rounded-2xl border border-indigo-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 dark:text-white transition-all duration-300 outline-none hover:bg-slate-100 dark:hover:bg-slate-700"
+                >
+            </div>
+
+            <button 
+                type="submit" 
+                class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-indigo-700 active:scale-[0.98] transform transition-all duration-300 shadow-xl shadow-indigo-100 dark:shadow-none mt-4 hover:shadow-indigo-200 hover:-translate-y-1 animate__animated animate__zoomIn"
+                style="animation-delay: 0.7s;"
+            >
+                Sign In
+            </button>
+
+            <p class="text-center text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-tight pt-2 animate__animated animate__fadeIn" style="animation-delay: 0.9s;">
+                Don't have an account? 
+                <a href="{% url 'signup' %}" class="text-indigo-600 hover:text-indigo-800 transition-colors underline-offset-4 hover:underline">
+                    Create Account
+                </a>
+            </p>
+        </form>
+
+    </div>
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const toasts = document.querySelectorAll('#toast-container .toast');
+    toasts.forEach(toast => {
+        setTimeout(() => {
+            toast.classList.add('opacity-0');
+            setTimeout(() => toast.remove(), 500);
+        }, 1000); 
+    });
+});
+</script>
+
+{% endblock %}

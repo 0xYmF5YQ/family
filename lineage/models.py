@@ -2,6 +2,8 @@ from django.db import models
 from django.utils import timezone
 from django.db.models import Sum
 
+
+
 class Parents(models.Model):
     name = models.CharField(max_length=200)
     gender = models.CharField(max_length=10, choices=[('M', 'Male'), ('F', 'Female')])
@@ -24,6 +26,7 @@ class Children(models.Model):
     parent = models.ForeignKey(Parents, on_delete=models.CASCADE, related_name='children')
     name = models.CharField(max_length=100)
     birth_date = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name_plural = "Children"
@@ -32,16 +35,14 @@ class Children(models.Model):
         return f"{self.name} (Child of {self.parent.name})"
     
 
-
+class EventType(models.Model):
+    name = models.CharField(max_length=100, unique=True) 
+    def __str__(self):
+        return self.name
+    
 class Event(models.Model):
-    EVENT_TYPES = [
-        ('Wedding', 'Wedding'),
-        ('Party', 'Party'),
-        ('Funeral', 'Funeral'),
-        ('Other', 'Other'),
-    ]
     title = models.CharField(max_length=200)
-    type = models.CharField(max_length=20, choices=EVENT_TYPES)
+    type = models.ForeignKey(EventType, on_delete=models.SET_NULL, null=True)  
     family_name = models.CharField(max_length=200)
     location = models.CharField(max_length=200)
     date = models.DateField()
@@ -50,6 +51,7 @@ class Event(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.family_name})"
+
 
     @property
     def total_contributed(self):
@@ -61,25 +63,33 @@ class Event(models.Model):
         return self.date < timezone.now().date()
 
 
+class Family(models.Model):
+    name = models.CharField(max_length=200, unique=True)
+
+    def __str__(self):
+        return self.name
 
 class Contribution(models.Model):
     event = models.ForeignKey(Event, related_name='contributions', on_delete=models.CASCADE)
+    family = models.ForeignKey(Family, related_name='contributions', on_delete=models.SET_NULL, null=True, blank=True)
     member_name = models.CharField(max_length=200)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"{self.member_name} - {self.event.title}"
 
 
+
+class AssetCategory(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.name
+    
 class Asset(models.Model):
-    CATEGORY_CHOICES = [
-        ('LAND', 'Land'),
-        ('BUILDING', 'Building'),
-        ('VEHICLE', 'Vehicle'),
-        ('OTHER', 'Other'),
-    ]
-
     title = models.CharField(max_length=200)
-    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+    category = models.ForeignKey(AssetCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name='assets')
     valuation = models.DecimalField(max_digits=15, decimal_places=2)
     location = models.CharField(max_length=200, blank=True, null=True)
     size = models.CharField(max_length=100, blank=True, null=True)
@@ -90,7 +100,8 @@ class Asset(models.Model):
         return sum(owner.share for owner in self.owners.all())
 
     def __str__(self):
-        return f"{self.title} ({self.get_category_display()})"
+        return f"{self.title} ({self.category.name if self.category else 'No Category'})"
+
 
 class Owner(models.Model):
     asset = models.ForeignKey(

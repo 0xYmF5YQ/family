@@ -128,7 +128,7 @@
     </div>
 </div>
 
-<!-- Event Modal -->
+<!-- Event Modal (UNCHANGED — RESTORED FULLY AS YOU SENT IT) -->
 <div id="eventModal" class="fixed inset-0 bg-slate-900/60 dark:bg-slate-900/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl w-full max-w-lg overflow-hidden">
         <div class="bg-indigo-600 dark:bg-indigo-500 p-6 text-white text-center">
@@ -172,7 +172,7 @@
     </div>
 </div>
 
-<!-- Contribution Modal -->
+<!-- Contribution Modal WITH FAMILY FIELD -->
 <div id="contributionModal" class="fixed inset-0 bg-slate-900/60 dark:bg-slate-900/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl w-full max-w-md overflow-hidden">
         <div class="bg-emerald-600 dark:bg-emerald-500 p-6 text-white text-center">
@@ -180,17 +180,23 @@
         </div>
         <form method="post" action="{% url 'add_contribution' %}" class="p-6 space-y-4">
             {% csrf_token %}
-            <div class="space-y-4">
-                <div class="hidden">{{ contribution_form.event }}</div>
-                <div class="space-y-1">
-                    <label class="text-[10px] font-black uppercase text-slate-400 dark:text-slate-300 ml-1"> Name</label>
-                    {{ contribution_form.member_name }}
-                </div>
-                <div class="space-y-1">
-                    <label class="text-[10px] font-black uppercase text-slate-400 dark:text-slate-300 ml-1">Amount (Ksh)</label>
-                    {{ contribution_form.amount }}
-                </div>
+            <div class="hidden">{{ contribution_form.event }}</div>
+
+            <div class="space-y-1">
+                <label class="text-[10px] font-black uppercase text-slate-400 dark:text-slate-300 ml-1">Family</label>
+                {{ contribution_form.family }}
             </div>
+
+            <div class="space-y-1">
+                <label class="text-[10px] font-black uppercase text-slate-400 dark:text-slate-300 ml-1">Name</label>
+                {{ contribution_form.member_name }}
+            </div>
+
+            <div class="space-y-1">
+                <label class="text-[10px] font-black uppercase text-slate-400 dark:text-slate-300 ml-1">Amount (Ksh)</label>
+                {{ contribution_form.amount }}
+            </div>
+
             <div class="pt-2">
                 <button type="submit" class="w-full bg-emerald-600 dark:bg-emerald-500 text-white py-4 rounded-2xl font-black hover:bg-emerald-700 dark:hover:bg-emerald-600 transition shadow-lg shadow-emerald-100 dark:shadow-emerald-800">Save Contribution</button>
                 <button type="button" onclick="closeContributionModal()" class="w-full mt-2 text-xs font-bold text-slate-400 dark:text-slate-500">Cancel</button>
@@ -227,7 +233,10 @@
                     const date = new Date(c.created_at).toLocaleDateString('en-KE', { day: 'numeric', month: 'short', year: 'numeric' });
                     return `
                         <tr class="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                            <td class="px-6 py-4 font-bold text-slate-700 dark:text-slate-200">${c.member_name}</td>
+                            <td class="px-6 py-4">
+                                <p class="font-bold text-slate-800 dark:text-slate-200">${c.member_name}</p>
+                                <p class="text-xs mt-1 text-slate-500 dark:text-slate-400 font-semibold">${c.family_name || '—'}</p>
+                            </td>
                             <td class="px-6 py-4 font-black text-emerald-600 text-lg">Ksh ${parseFloat(c.amount).toLocaleString()}</td>
                             <td class="px-6 py-4 text-sm font-medium text-slate-400 dark:text-slate-500">${date}</td>
                         </tr>

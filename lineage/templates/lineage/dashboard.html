@@ -1,0 +1,206 @@
+{% extends 'lineage/base.html' %}
+{% load humanize %}
+
+{% block title %}Dashboard | Family Lineage{% endblock %}
+
+{% block content %}
+<div class="animate__animated animate__fadeIn space-y-10 max-w-[95%] mx-auto">
+
+    <!-- Dashboard Overview Cards -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b dark:border-slate-800 pb-8">
+        <div>
+            <h2 class="text-4xl font-black text-slate-800 dark:text-white tracking-tighter uppercase">
+                Welcome, {{ request.user.username }}
+            </h2>
+            <p class="text-slate-500 dark:text-slate-400 font-bold uppercase text-xs tracking-widest mt-1">
+                Lineage Overview & Insights
+            </p>
+        </div>
+        <div class="text-right">
+            <p class="text-indigo-600 dark:text-indigo-400 font-black text-sm uppercase tracking-tight">
+                {% now "l, jS F Y" %}
+            </p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Total Parents -->
+        <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-xl flex items-center gap-6">
+            <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 text-blue-600 rounded-3xl flex items-center justify-center text-3xl">
+                <i class="fas fa-users"></i>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Parents</p>
+                <h3 class="text-3xl font-black text-slate-800 dark:text-white">{{ total_parents }}</h3>
+            </div>
+        </div>
+
+        <!-- Total Children -->
+        <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-xl flex items-center gap-6">
+            <div class="w-16 h-16 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 rounded-3xl flex items-center justify-center text-3xl">
+                <i class="fas fa-child"></i>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Children</p>
+                <h3 class="text-3xl font-black text-slate-800 dark:text-white">{{ total_children }}</h3>
+            </div>
+        </div>
+
+        <!-- Active Assets -->
+        <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-xl flex items-center gap-6">
+            <div class="w-16 h-16 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 rounded-3xl flex items-center justify-center text-3xl">
+                <i class="fas fa-vault"></i>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Active Assets</p>
+                <h3 class="text-3xl font-black text-slate-800 dark:text-white">{{ total_assets }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- Next Major Event -->
+        <div class="lg:col-span-2 space-y-8">
+            <h4 class="text-xl font-black text-slate-800 dark:text-white uppercase flex items-center gap-3">
+                <span class="w-2 h-8 bg-rose-500 rounded-full"></span> Next Major Event
+            </h4>
+
+            {% if upcoming_event %}
+            <div class="relative group overflow-hidden bg-slate-900 rounded-[3rem] p-10 text-white shadow-2xl">
+                <div class="absolute top-0 right-0 p-8 opacity-10 text-9xl transform translate-x-10 -translate-y-10 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
+                    <div class="space-y-4">
+                        <span class="px-4 py-1 bg-rose-500 text-[10px] font-black uppercase rounded-full">Primary Schedule</span>
+                        <h3 class="text-4xl font-black tracking-tighter uppercase">{{ upcoming_event.title }}</h3>
+                        <p class="text-slate-400 font-bold flex items-center gap-2">
+                            <i class="fas fa-map-marker-alt text-rose-500"></i> {{ upcoming_event.location }}
+                        </p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-md rounded-[2.5rem] p-8 text-center min-w-[180px] border border-white/10">
+                        <p class="text-rose-400 text-5xl font-black mb-1">{{ upcoming_event.date|date:"d" }}</p>
+                        <p class="text-xs font-black uppercase tracking-widest">{{ upcoming_event.date|date:"F Y" }}</p>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="bg-slate-100 dark:bg-slate-800/50 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-[3rem] p-20 text-center">
+                <p class="text-slate-400 font-bold uppercase text-sm italic">No events currently scheduled.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="space-y-8">
+            <h4 class="text-xl font-black text-slate-800 dark:text-white uppercase flex items-center gap-3">
+                <span class="w-2 h-8 bg-indigo-500 rounded-full"></span> Recent Activity
+            </h4>
+
+            <div id="activity-container" class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-xl overflow-hidden">
+                <ul id="activity-list" class="divide-y divide-slate-50 dark:divide-slate-800">
+                    {% for activity in recent_activities %}
+                    <li class="p-5 flex items-start gap-4 activity-item"
+                        data-id="{{ activity.id }}"
+                        data-type="{% if activity.amount %}payment{% elif activity.asset_name %}asset{% elif activity.child_name %}child{% endif %}">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm
+                            {% if activity.amount %} bg-emerald-100 text-emerald-600 {% elif activity.asset_name %} bg-indigo-100 text-indigo-600 {% elif activity.child_name %} bg-blue-100 text-blue-600 {% else %} bg-gray-100 text-gray-600 {% endif %}">
+                            {% if activity.amount %}<i class="fas fa-money-bill-wave"></i>
+                            {% elif activity.asset_name %}<i class="fas fa-landmark"></i>
+                            {% elif activity.child_name %}<i class="fas fa-child"></i>
+                            {% else %}<i class="fas fa-info"></i>{% endif %}
+                        </div>
+                        <div class="flex-1 text-[11px] font-bold">
+                           <p class="text-slate-800 dark:text-slate-200">
+                                {% if activity.amount %}
+                                    {{ activity.user.get_full_name|default:"System" }} contributed Ksh {{ activity.amount|intcomma }} to {{ activity.event_name }}
+                                {% elif activity.asset_name %}
+                                    New asset registered: {{ activity.asset_name }} (Ksh {{ activity.asset_value|intcomma }})
+                                {% elif activity.child_name %}
+                                    Child added: {{ activity.child_name }} (Parent: {{ activity.parent_name }})
+                                {% endif %}
+                            </p>
+                            <p class="text-slate-400 text-[9px] mt-0.5">
+                                {{ activity.created_at|timesince }} ago
+                            </p>
+                        </div>
+                    </li>
+                    {% empty %}
+                    <li class="p-10 text-center text-slate-400 text-xs font-bold uppercase italic">No recent updates.</li>
+                    {% endfor %}
+                </ul>
+                <div id="loading" class="p-5 text-center text-slate-400 hidden">Loading more...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+let nextPage = 2;
+let loading = false;
+
+const container = document.getElementById('activity-container');
+const list = document.getElementById('activity-list');
+const loadingIndicator = document.getElementById('loading');
+
+window.addEventListener('scroll', async () => {
+    if (loading) return;
+    if ((window.innerHeight + window.scrollY) >= container.offsetTop + container.offsetHeight - 200) {
+        loading = true;
+        loadingIndicator.classList.remove('hidden');
+        try {
+            const response = await fetch("{% url 'recent_activities_api' %}?page=" + nextPage);
+            if (!response.ok) throw new Error('Network error');
+            const data = await response.json();
+            if (data.activities.length === 0) return;
+
+            data.activities.forEach(activity => {
+                const li = document.createElement('li');
+                li.className = 'p-5 flex items-start gap-4 activity-item';
+                li.dataset.id = activity.id;
+                li.dataset.type = activity.type;
+
+                let iconClass = '';
+                let bgClass = '';
+                let text = '';
+
+                if(activity.type === 'payment') {
+                    iconClass = 'fas fa-money-bill-wave';
+                    bgClass = 'bg-emerald-100 text-emerald-600';
+                    text = `${activity.user_name} contributed Ksh ${activity.amount} to ${activity.event_name}`;
+                } else if(activity.type === 'asset') {
+                    iconClass = 'fas fa-landmark';
+                    bgClass = 'bg-indigo-100 text-indigo-600';
+                    text = `New asset registered: ${activity.asset_name} (Ksh ${activity.asset_value})`;
+                } else if(activity.type === 'child') {
+                    iconClass = 'fas fa-child';
+                    bgClass = 'bg-blue-100 text-blue-600';
+                    text = `Child added: ${activity.child_name} (Parent: ${activity.parent_name})`;
+                }
+
+                li.innerHTML = `
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm ${bgClass}">
+                        <i class="${iconClass}"></i>
+                    </div>
+                    <div class="flex-1 text-[11px] font-bold">
+                        <p class="text-slate-800 dark:text-slate-200">${text}</p>
+                        <p class="text-slate-400 text-[9px] mt-0.5">${activity.time_since} ago</p>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+
+            nextPage++;
+        } catch (err) {
+            console.error(err);
+        } finally {
+            loading = false;
+            loadingIndicator.classList.add('hidden');
+        }
+    }
+});
+</script>
+{% endblock %}

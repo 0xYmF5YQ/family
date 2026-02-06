@@ -1,9 +1,15 @@
 from django.urls import path
 from . import views
+from . import auth_views
 
 urlpatterns = [
   
-    path('', views.home, name='home'),
+    path('', auth_views.login_view, name='login'),
+
+
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('dashboard/activities/json/<int:page>/', views.dashboard_activities_json, name='dashboard_activities_json'),
+     path('api/recent-activities/', views.recent_activities_api, name='recent_activities_api'),
 
     path('parents/', views.parent, name='parents'),
     path('parents/<int:pk>/', views.parent_detail, name='parent_detail'),
@@ -20,6 +26,10 @@ urlpatterns = [
     path('assets/add/', views.add_asset, name='add_asset'),
     path('assets/json/<int:asset_id>/', views.asset_detail_json, name='asset_detail_json'),
     path('assets/<int:asset_id>/add_owner/', views.add_owner, name='add_owner'),
+
+    path('login/', auth_views.login_view, name='login'),
+    path('signup/', auth_views.signup_view, name='signup'),
+    path('logout/', auth_views.logout_view, name='logout'),
 
     
 ]

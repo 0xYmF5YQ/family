@@ -21,33 +21,38 @@
                 <i class="fas fa-chart-line"></i>
             </div>
             <div>
-                <p class="text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-widest">Total Valuation</p>
-                <h3 class="text-2xl font-black text-slate-800 dark:text-slate-200">Ksh {{ total_valuation|floatformat:0 }}</h3>
+                <p class="text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-widest">Total Portfolio Valuation</p>
+                <h3 class="text-2xl font-black text-slate-800 dark:text-slate-200">Ksh {{ total_valuation|floatformat:2 }}</h3>
             </div>
         </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-6">
         {% for asset in assets %}
-        <div class="group bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer" onclick="openAssetDrawer('{{ asset.id }}')">
+        <div class="group bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer flex flex-col justify-between" onclick="openAssetDrawer('{{ asset.id }}')">
             <div class="p-6">
                 <div class="flex justify-between items-start mb-4">
-                    <span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[10px] font-bold uppercase rounded-full">
-                        {{ asset.get_category_display }}
+                    <span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[10px] font-bold uppercase rounded-full border dark:border-slate-700">
+                        {{ asset.category.name|default:"General" }}
                     </span>
-                    <i class="fas fa-ellipsis-v text-slate-300 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"></i>
+                    <span class="text-xs font-bold text-slate-400">
+                        <i class="fas fa-users mr-1"></i> {{ asset.owners.count }}
+                    </span>
                 </div>
-                <h4 class="text-xl font-bold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{{ asset.title }}</h4>
                 
-                {% if asset.category == 'LAND' %}
-                <div class="mt-4 space-y-2">
+                <h4 class="text-xl font-black text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors uppercase tracking-tight">
+                    {{ asset.title }}
+                </h4>
+                
+                {% if asset.category.name == 'LAND' or asset.category.name == 'Land' %}
+                <div class="mt-4 space-y-2 bg-slate-50 dark:bg-slate-800/40 p-3 rounded-xl">
                     <div class="flex items-center gap-3 text-slate-500 dark:text-slate-400">
-                        <i class="fas fa-map-marker-alt w-5 text-indigo-400 dark:text-indigo-300"></i>
-                        <span class="text-sm font-medium">{{ asset.location }}</span>
+                        <i class="fas fa-map-marker-alt w-4 text-indigo-500"></i>
+                        <span class="text-xs font-bold uppercase">{{ asset.location|default:"Unknown Location" }}</span>
                     </div>
                     <div class="flex items-center gap-3 text-slate-500 dark:text-slate-400">
-                        <i class="fas fa-vector-square w-5 text-emerald-400 dark:text-emerald-300"></i>
-                        <span class="text-sm font-medium">{{ asset.size }}</span>
+                        <i class="fas fa-vector-square w-4 text-emerald-500"></i>
+                        <span class="text-xs font-bold uppercase">{{ asset.size|default:"N/A" }}</span>
                     </div>
                 </div>
                 {% else %}
@@ -59,99 +64,119 @@
 
             <div class="px-6 py-4 bg-slate-50/50 dark:bg-slate-800/50 border-t border-slate-50 dark:border-slate-700 flex justify-between items-center">
                 <div>
-                    <p class="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">Estimated Value</p>
-                    <p class="text-lg font-black text-slate-800 dark:text-slate-200">Ksh {{ asset.valuation }}</p>
+                    <p class="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-tighter">Current Valuation</p>
+                    <p class="text-lg font-black text-indigo-600 dark:text-indigo-400">Ksh {{ asset.valuation|floatformat:2 }}</p>
                 </div>
-                <button class="w-10 h-10 rounded-full bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-400 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition flex items-center justify-center">
+                <div class="w-10 h-10 rounded-full bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-400 dark:text-slate-300 group-hover:bg-indigo-600 group-hover:text-white transition flex items-center justify-center">
                     <i class="fas fa-arrow-right text-xs"></i>
-                </button>
+                </div>
             </div>
         </div>
         {% empty %}
         <div class="col-span-full py-20 text-center text-slate-400 dark:text-slate-500">
-            <i class="fas fa-box-open text-4xl mb-4"></i>
-            <p>No assets recorded yet.</p>
+            <i class="fas fa-box-open text-5xl mb-4 opacity-20"></i>
+            <p class="font-bold">No family assets recorded yet.</p>
         </div>
         {% endfor %}
     </div>
 </div>
 
-<!-- Asset Drawer -->
-<div id="assetDrawer" class="fixed inset-0 bg-slate-900/60 dark:bg-slate-900/70 backdrop-blur-sm hidden z-50">
-    <div class="absolute right-0 top-0 h-full w-full max-w-3xl bg-white dark:bg-slate-900 shadow-2xl flex flex-col">
-        <div class="p-6 border-b flex justify-between items-center bg-slate-50 dark:bg-slate-800">
+<div id="assetDrawer" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 transition-opacity duration-300">
+    <div class="absolute right-0 top-0 h-full w-full max-w-2xl bg-white dark:bg-slate-900 shadow-2xl flex flex-col animate__animated animate__slideInRight">
+        <div class="p-6 border-b dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800">
             <div>
-                <h3 id="drawerTitle" class="text-xl font-bold text-slate-800 dark:text-slate-200"></h3>
-                <p id="drawerMeta" class="text-sm text-slate-500 dark:text-slate-400"></p>
+                <h3 id="drawerTitle" class="text-2xl font-black text-slate-800 dark:text-slate-200 uppercase"></h3>
+                <p id="drawerMeta" class="text-xs font-bold text-indigo-500 uppercase tracking-widest"></p>
             </div>
-            <button onclick="closeAssetDrawer()" class="text-slate-400 dark:text-slate-300 hover:text-slate-700 dark:hover:text-slate-100">
-                <i class="fas fa-times text-xl"></i>
+            <button onclick="closeAssetDrawer()" class="w-10 h-10 rounded-full flex items-center justify-center bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:bg-rose-500 hover:text-white transition">
+                <i class="fas fa-times"></i>
             </button>
         </div>
 
-        <div class="p-6 space-y-6 overflow-y-auto">
+        <div class="p-8 space-y-8 overflow-y-auto">
             <div class="flex justify-between items-center">
-                <h4 class="font-bold text-slate-700 dark:text-slate-200">Owners</h4>
-                <button id="openOwnerModal" class="bg-emerald-600 dark:bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-emerald-700 dark:hover:bg-emerald-600 transition">
-                    <i class="fas fa-user-plus"></i> Add Owner
+                <h4 class="text-lg font-black text-slate-800 dark:text-slate-200 uppercase tracking-tight">Shareholders</h4>
+                <button id="openOwnerModal" class="bg-emerald-600 text-white px-5 py-2.5 rounded-xl text-xs font-black uppercase hover:bg-emerald-700 transition flex items-center gap-2">
+                    <i class="fas fa-user-plus"></i> Add Shareholder
                 </button>
             </div>
 
-            <div class="overflow-x-auto rounded-xl border border-slate-100 dark:border-slate-700">
-                <table class="w-full dark:text-slate-200">
-                    <thead class="bg-slate-50 dark:bg-slate-800 text-xs uppercase text-slate-500 dark:text-slate-400 font-bold">
+            <div class="overflow-hidden rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-50 dark:bg-slate-800 text-[10px] uppercase text-slate-400 font-black">
                         <tr>
-                            <th class="px-4 py-3 text-left">Member</th>
-                            <th class="px-4 py-3">Contribution/Share</th>
-                            <th class="px-4 py-3">Date</th>
+                            <th class="px-6 py-4">Family Member</th>
+                            <th class="px-6 py-4 text-center">Share (%) / Value</th>
+                            <th class="px-6 py-4">Date Added</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-50 dark:divide-slate-700"></tbody>
+                    <tbody id="drawerTableBody" class="divide-y divide-slate-50 dark:divide-slate-800"></tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Owner Modal -->
-<div id="ownerModal" class="fixed inset-0 bg-slate-900/60 dark:bg-slate-900/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
-        <div class="bg-emerald-600 dark:bg-emerald-500 p-6 text-white text-center">
-            <h3 class="text-xl font-bold">Add Owner</h3>
+<div id="assetModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4 overflow-y-auto">
+    <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl w-full max-w-xl transform transition-all duration-300" id="assetModalBox">
+        <div class="p-10">
+            <div class="flex justify-between items-start mb-8">
+                <div>
+                    <h3 class="text-3xl font-black text-slate-800 dark:text-slate-100 uppercase tracking-tighter">New Asset</h3>
+                    <p class="text-slate-400 text-sm font-medium">Add a new item to the family registry</p>
+                </div>
+                <button onclick="closeAssetModal()" class="text-slate-300 hover:text-rose-500 transition-colors"><i class="fas fa-times-circle text-2xl"></i></button>
+            </div>
+            <form method="post" action="{% url 'add_asset' %}" class="space-y-6">
+                {% csrf_token %}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="md:col-span-2">
+                        <label class="text-[10px] font-black uppercase text-slate-400 mb-2 block">Asset Title</label>
+                        {{ form.title }}
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-slate-400 mb-2 block">Category</label>
+                        {{ form.category }}
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-slate-400 mb-2 block">Valuation (Ksh)</label>
+                        {{ form.valuation }}
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-slate-400 mb-2 block">Location</label>
+                        {{ form.location }}
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-slate-400 mb-2 block">Size/Area</label>
+                        {{ form.size }}
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-slate-900 dark:bg-indigo-600 text-white py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 dark:shadow-none">
+                    Confirm Registration
+                </button>
+            </form>
         </div>
-        <form id="ownerForm" method="post" action="#" class="p-6 space-y-4">
-            {% csrf_token %}
-            {{ owner_form.as_p }}
-            <button type="submit" class="w-full bg-emerald-600 dark:bg-emerald-500 text-white py-3 rounded-xl font-bold hover:bg-emerald-700 dark:hover:bg-emerald-600 transition">
-                Save Owner
-            </button>
-            <button type="button" onclick="closeOwnerModal()" class="w-full text-sm text-slate-400 dark:text-slate-500 mt-2">Cancel</button>
-        </form>
     </div>
 </div>
 
-<!-- Asset Modal -->
-<div id="assetModal" class="fixed inset-0 bg-slate-900/60 dark:bg-slate-900/70 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4 overflow-y-auto">
-    <div class="bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl w-full max-w-lg transform scale-95 opacity-0 transition-all duration-300 my-auto" id="assetModalBox">
-        <div class="p-8">
-            <div class="flex justify-between items-start mb-6">
-                <div>
-                    <h3 class="text-2xl font-bold text-slate-800 dark:text-slate-200">Register New Asset</h3>
-                </div>
-                <button onclick="closeAssetModal()" class="text-slate-400 dark:text-slate-300"><i class="fas fa-times text-xl"></i></button>
-            </div>
-            <form method="post" action="{% url 'add_asset' %}" class="space-y-4">
-                {% csrf_token %}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="md:col-span-2">{{ form.title }}</div>
-                    <div>{{ form.category }}</div>
-                    <div>{{ form.valuation }}</div>
-                    <div>{{ form.location }}</div>
-                    <div>{{ form.size }}</div>
-                </div>
-                <button type="submit" class="w-full bg-slate-800 dark:bg-slate-700 text-white py-4 rounded-2xl font-bold hover:bg-slate-900 dark:hover:bg-slate-600 transition">Confirm & Save</button>
-            </form>
+<div id="ownerModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden">
+        <div class="bg-emerald-600 p-8 text-white text-center">
+            <h3 class="text-2xl font-black uppercase tracking-tight">Assign Share</h3>
+            <p class="text-emerald-100 text-xs font-bold opacity-80 uppercase">Linking member to asset</p>
         </div>
+        <form id="ownerForm" method="post" class="p-8 space-y-4">
+            {% csrf_token %}
+            <div class="space-y-4 [&_p]:flex [&_p]:flex-col [&_p]:gap-2 [&_label]:text-[10px] [&_label]:font-black [&_label]:uppercase [&_label]:text-slate-400">
+                {{ owner_form.as_p }}
+            </div>
+            <div class="pt-4 flex flex-col gap-3">
+                <button type="submit" class="w-full bg-emerald-600 text-white py-4 rounded-xl font-black uppercase tracking-widest hover:bg-emerald-700 transition">
+                    Finalize Ownership
+                </button>
+                <button type="button" onclick="closeOwnerModal()" class="w-full text-xs font-bold text-slate-400 uppercase tracking-widest hover:text-rose-500 transition">close</button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -161,10 +186,10 @@
     const ownerModal = document.getElementById('ownerModal');
     const assetDrawer = document.getElementById('assetDrawer');
     const ownerForm = document.getElementById('ownerForm');
-
+    const drawerTableBody = document.getElementById('drawerTableBody');
     document.getElementById('openAssetModal').onclick = () => {
         aModal.classList.remove('hidden');
-        setTimeout(() => { aBox.classList.remove('scale-95', 'opacity-0'); aBox.classList.add('scale-100', 'opacity-100'); }, 10);
+        setTimeout(() => { aBox.classList.remove('scale-95', 'opacity-0'); }, 10);
     };
     function closeAssetModal() {
         aBox.classList.add('scale-95', 'opacity-0');
@@ -172,33 +197,39 @@
     }
 
     async function openAssetDrawer(id) {
-        const tbody = assetDrawer.querySelector('tbody');
         assetDrawer.classList.remove('hidden');
-        document.getElementById('drawerTitle').innerText = 'Loading...';
-        tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-8 text-center text-slate-400 dark:text-slate-500"><i class="fas fa-spinner fa-spin"></i></td></tr>';
+        document.getElementById('drawerTitle').innerText = 'Syncing Data...';
+        drawerTableBody.innerHTML = '<tr><td colspan="3" class="px-6 py-12 text-center text-slate-400"><i class="fas fa-circle-notch fa-spin text-2xl mb-2"></i><p class="text-xs font-bold uppercase">Fetching Registry</p></td></tr>';
 
         try {
             const response = await fetch(`/assets/json/${id}/`);
             const data = await response.json();
+            
             document.getElementById('drawerTitle').innerText = data.title;
-            document.getElementById('drawerMeta').innerText = `${data.category} • Ksh ${parseFloat(data.valuation).toLocaleString()}`;
+            document.getElementById('drawerMeta').innerText = `${data.category || 'Asset'} • Valuation: Ksh ${parseFloat(data.valuation).toLocaleString()}`;
 
-            tbody.innerHTML = data.owners.length > 0 ? data.owners.map(o => `
-                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                    <td class="px-4 py-3 font-medium text-slate-700 dark:text-slate-200">${o.member_name}</td>
-                    <td class="px-4 py-3 font-bold text-emerald-600">${o.share}</td>
-                    <td class="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">${o.created_at}</td>
+            drawerTableBody.innerHTML = data.owners.length > 0 ? data.owners.map(o => `
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                    <td class="px-6 py-4">
+                        <p class="font-black text-slate-800 dark:text-slate-200 uppercase text-sm">${o.member_name}</p>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="px-3 py-1 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-lg font-black text-xs">
+                            ${o.share}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-xs font-bold text-slate-400 uppercase">${o.created_at}</td>
                 </tr>
-            `).join('') : '<tr><td colspan="3" class="px-4 py-8 text-center text-slate-300 dark:text-slate-500 italic">No owners yet.</td></tr>';
+            `).join('') : '<tr><td colspan="3" class="px-6 py-12 text-center text-slate-300 italic uppercase font-bold text-xs">No owners registered to this asset yet.</td></tr>';
 
             ownerForm.action = `/assets/${id}/add_owner/`;
         } catch (error) {
             console.error("Error:", error);
-            document.getElementById('drawerTitle').innerText = 'Error';
+            document.getElementById('drawerTitle').innerText = 'Data Error';
         }
     }
+    
     function closeAssetDrawer() { assetDrawer.classList.add('hidden'); }
-
     document.getElementById('openOwnerModal').onclick = () => ownerModal.classList.remove('hidden');
     function closeOwnerModal() { ownerModal.classList.add('hidden'); }
 
@@ -206,7 +237,7 @@
         e.preventDefault();
         const submitBtn = this.querySelector('button[type="submit"]');
         submitBtn.disabled = true;
-        submitBtn.innerText = "Saving...";
+        submitBtn.innerText = "Processing...";
 
         try {
             const response = await fetch(this.action, {
@@ -216,20 +247,21 @@
             });
             const data = await response.json();
             if (data.status === 'success') {
-                const tbody = assetDrawer.querySelector('tbody');
-                if (tbody.innerHTML.includes('italic')) tbody.innerHTML = '';
-                tbody.insertAdjacentHTML('afterbegin', `
-                    <tr class="bg-emerald-50 animate__animated animate__fadeInDown">
-                        <td class="px-4 py-3 font-medium text-slate-700 dark:text-slate-200">${data.member_name}</td>
-                        <td class="px-4 py-3 font-bold text-emerald-600">${data.share}</td>
-                        <td class="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">${data.created_at}</td>
+                if (drawerTableBody.innerHTML.includes('italic')) drawerTableBody.innerHTML = '';
+                drawerTableBody.insertAdjacentHTML('afterbegin', `
+                    <tr class="bg-emerald-50 dark:bg-emerald-900/10 animate__animated animate__fadeInDown">
+                        <td class="px-6 py-4 font-black text-slate-800 dark:text-slate-200 uppercase text-sm">${data.member_name}</td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-lg font-black text-xs">${data.share}</span>
+                        </td>
+                        <td class="px-6 py-4 text-xs font-bold text-slate-400 uppercase">${data.created_at}</td>
                     </tr>
                 `);
                 closeOwnerModal();
                 this.reset();
-            } else alert("Please check your input.");
-        } catch { alert("Connection error."); }
-        finally { submitBtn.disabled = false; submitBtn.innerText = "Save Owner"; }
+            } else alert("Invalid Input. Please check values.");
+        } catch { alert("Connection error. Try again."); }
+        finally { submitBtn.disabled = false; submitBtn.innerText = "Finalize Ownership"; }
     };
 </script>
 {% endblock %}

@@ -1,7 +1,9 @@
 from django import forms
+from django.contrib.auth.models import User
 from .models import Parents, Children
-from .models import Contribution, Event
+from .models import Contribution, Event, Family, EventType, AssetCategory
 from .models import Asset, Owner
+       
 
 class ParentForm(forms.ModelForm):
     class Meta:
@@ -89,21 +91,36 @@ class EventForm(forms.ModelForm):
             }),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['type'].queryset = EventType.objects.all()
+        self.fields['type'].empty_label = "Select Event Type"
+
+
 
 class ContributionForm(forms.ModelForm):
     class Meta:
         model = Contribution
-        fields = ['event', 'member_name', 'amount']
+        fields = ['event', 'family', 'member_name', 'amount']
         widgets = {
+            'family': forms.Select(attrs={
+                'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400'
+            }),
             'member_name': forms.TextInput(attrs={
-                'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400'
+                'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400'
             }),
             'amount': forms.NumberInput(attrs={
-                'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400',
+                'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400',
                 'min': 0
             }),
         }
- 
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['family'].queryset = Family.objects.all()
+        self.fields['family'].empty_label = "Select Family"
+
+
 
 class AssetForm(forms.ModelForm):
     class Meta:
@@ -135,6 +152,12 @@ class AssetForm(forms.ModelForm):
                 'placeholder': 'Optional description'
             }),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['category'].queryset = AssetCategory.objects.all()
+        self.fields['category'].empty_label = "Select a category"
+
 
 class OwnerForm(forms.ModelForm):
     class Meta:
