@@ -1,3 +1,70 @@
 from django.contrib import admin
+from .models import (
+    Parents, Children, EventType, Event, 
+    Family, Contribution, AssetCategory, Asset, Owner
+)
 
-# Register your models here.
+
+class ChildrenInline(admin.TabularInline):
+    model = Children
+    extra = 1 
+    fields = ['name', 'birth_date']
+
+
+class OwnerInline(admin.TabularInline):
+    model = Owner
+    extra = 1
+
+
+@admin.register(Parents)
+class ParentsAdmin(admin.ModelAdmin):
+    list_display = ('name', 'gender', 'birth_date', 'user', 'created_at')
+    list_filter = ('gender', 'birth_date')
+    search_fields = ('name',)
+    inlines = [ChildrenInline] 
+
+@admin.register(Children)
+class ChildrenAdmin(admin.ModelAdmin):
+   
+    list_display = ('name', 'parent', 'birth_date', 'user')
+    readonly_fields = ('get_siblings',) 
+    
+    fields = ('parent', 'name', 'birth_date', 'user', 'get_siblings') 
+
+    def get_siblings(self, obj):
+        siblings = Children.objects.filter(parent=obj.parent).exclude(id=obj.id)
+        
+        if siblings.exists():
+            return ", ".join([s.name for s in siblings])
+        return "No siblings found."
+
+    
+    get_siblings.short_description = "Siblings"
+
+
+@admin.register(Event)
+class EventAdmin(admin.ModelAdmin):
+    list_display = ('title', 'type', 'family_name', 'date', 'goal_amount', 'is_active')
+    list_filter = ('is_active', 'date', 'type')
+    search_fields = ('title', 'family_name')
+
+@admin.register(Contribution)
+class ContributionAdmin(admin.ModelAdmin):
+    list_display = ('member_name', 'event', 'amount', 'family', 'created_at')
+    list_filter = ('event', 'family')
+    search_fields = ('member_name',)
+
+
+@admin.register(Asset)
+class AssetAdmin(admin.ModelAdmin):
+    list_display = ('title', 'category', 'valuation', 'location', 'size')
+    list_filter = ('category', 'created_at')
+    search_fields = ('title', 'location')
+    inlines = [OwnerInline] 
+
+
+
+admin.site.register(EventType)
+admin.site.register(Family)
+admin.site.register(AssetCategory)
+admin.site.register(Owner)

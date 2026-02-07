@@ -28,7 +28,7 @@ urlpatterns = [
     path('assets/<int:asset_id>/add_owner/', views.add_owner, name='add_owner'),
 
     path('login/', auth_views.login_view, name='login'),
-    path('signup/', auth_views.signup_view, name='signup'),
+    #path('signup/', auth_views.signup_view, name='signup'),
     path('logout/', auth_views.logout_view, name='logout'),
 
     

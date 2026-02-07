@@ -9,7 +9,13 @@
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b dark:border-slate-800 pb-8">
         <div>
             <h2 class="text-2xl font-black text-slate-800 dark:text-white tracking-tighter uppercase">
-                Welcome, {{ request.user.username }}
+                Welcome,    {% if request.user.parents %}
+                                {{ request.user.parents.name }}
+                            {% elif request.user.children %}
+                                {{ request.user.children.name }}
+                            {% else %}
+                                {{ request.user.username }}
+                            {% endif %}
             </h2>
             <p class="text-slate-500 dark:text-slate-400 font-bold uppercase text-xs tracking-widest mt-1">
                 Lineage Overview & Insights

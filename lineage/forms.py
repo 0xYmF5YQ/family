@@ -1,9 +1,49 @@
 from django import forms
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import AuthenticationForm
 from .models import Parents, Children
 from .models import Contribution, Event, Family, EventType, AssetCategory
 from .models import Asset, Owner
+
+
+class LoginForm(AuthenticationForm):
+    name = forms.CharField(
+        max_length=200,
+        required=False,
+        label="Full Name",
+        widget=forms.TextInput(attrs={'placeholder': 'Full Name'})
+    )
+    birth_year = forms.IntegerField(
+        required=False,
+        label="Year of Birth",
+        widget=forms.NumberInput(attrs={'placeholder': 'Year of Birth'})
+    )
+
+    password = forms.CharField(
+        required=False,
+        label="Password",
+        widget=forms.PasswordInput(attrs={'placeholder': 'Password'})
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        name = cleaned_data.get('name')
+        birth_year = cleaned_data.get('birth_year')
+        password = cleaned_data.get('password')
+        username = cleaned_data.get('username')  
        
+        if (name and birth_year):
+      
+            return cleaned_data
+        elif username and password:
+            
+            return cleaned_data
+        else:
+            raise forms.ValidationError(
+                "Enter either Full Name + Birth Year."
+            )
+        return cleaned_data
+      
 
 class ParentForm(forms.ModelForm):
     class Meta:
@@ -53,8 +93,6 @@ class ChildForm(forms.ModelForm):
                 'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400',
             }),
         }
-
-   
 
 
 class EventForm(forms.ModelForm):
