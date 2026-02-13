@@ -5,12 +5,36 @@
 {% block content %}
 <div class="transition-all duration-500 ease-out max-w-[95%] mx-auto px-4">
 
-    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-        <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-200">Manage Parents</h2>
-        <button id="openModalBtn"
-            class="bg-indigo-600 dark:bg-indigo-500 text-white px-6 py-2 rounded-xl font-medium hover:bg-indigo-700 dark:hover:bg-indigo-600 transition flex items-center gap-2 shadow-lg shadow-indigo-100 dark:shadow-indigo-800">
-            <i class="fas fa-plus text-sm"></i> Add Parent
-        </button>
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+        <div>
+            <h2 class="text-4xl font-extrabold text-slate-900 dark:text-slate-200 tracking-tight">Parents Directory</h2>
+            <p class="text-slate-500 dark:text-slate-400 text-lg">Manage and view all family heads and their lineages.</p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+            <div class="relative group w-full sm:w-80">
+                <input 
+                    type="text" 
+                    id="live-search"
+                    name="q" 
+                    placeholder="Search parent name..." 
+                    value="{{ query|default:'' }}"
+                    class="w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all shadow-sm group-hover:shadow-md dark:text-slate-200"
+                    autocomplete="off"
+                >
+                <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div id="search-spinner" class="absolute right-4 top-1/2 -translate-y-1/2 hidden">
+                    <i class="fas fa-circle-notch fa-spin text-indigo-500"></i>
+                </div>
+            </div>
+
+            <button id="openModalBtn"
+                class="w-full sm:w-auto bg-indigo-600 dark:bg-indigo-500 text-white px-6 py-3 rounded-xl font-medium hover:bg-indigo-700 dark:hover:bg-indigo-600 transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-100 dark:shadow-indigo-800">
+                <i class="fas fa-plus text-sm"></i> Add Parent
+            </button>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -22,16 +46,16 @@
             </div>
             <div class="z-10">
                 <p class="text-indigo-100 dark:text-indigo-200 font-medium uppercase tracking-wider text-[10px]">Total Parents</p>
-                <h3 class="text-3xl font-black">{{ all_parents|length }}</h3>
+                <h3 class="text-3xl font-black" id="total-count">{{ all_parents|length }}</h3>
             </div>
         </div>
     </div>
 
-    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-6 mb-8">
+    <div id="results-container" class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-6 mb-8 min-h-[300px]">
         <h3 class="text-xl font-bold text-slate-800 dark:text-slate-200 mb-6 border-b pb-4">Current Parents</h3>
 
         {% if all_parents %}
-        <ul class="space-y-4">
+        <ul class="space-y-4 animate-fade-in">
             {% for parent in all_parents %}
             <li class="relative pl-8 transition-all duration-300 hover:translate-x-1">
                 <div class="absolute left-0 top-0 h-full w-px bg-slate-200 dark:bg-slate-700"></div>
@@ -53,14 +77,42 @@
             {% endfor %}
         </ul>
         {% else %}
-        <p class="text-slate-500 dark:text-slate-400 italic p-4 text-center">
-            No parents added yet. Use the "Add Parent" button to get started!
-        </p>
+        <div class="text-center py-16 animate-fade-in">
+            <div class="relative inline-block mb-4">
+                <i class="fas fa-search text-6xl text-slate-200 dark:text-slate-700 animate-float"></i>
+            </div>
+            
+            {% if suggestion %}
+            <div class="mt-4 p-4 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl inline-block border border-indigo-100 dark:border-indigo-800">
+                <p class="text-slate-600 dark:text-slate-300">
+                    Did you mean: 
+                    <a href="?q={{ suggestion }}" class="text-indigo-600 dark:text-indigo-400 font-black hover:underline underline-offset-4">
+                        {{ suggestion }}
+                    </a>?
+                </p>
+            </div>
+            {% else %}
+            <p class="text-slate-500 dark:text-slate-400 italic">
+                {% if query %}
+                    No parents found matching "{{ query }}".
+                {% else %}
+                    No parents added yet. Use the "Add Parent" button to get started!
+                {% endif %}
+            </p>
+            {% endif %}
+            
+            {% if query %}
+            <div class="mt-6">
+                <a href="{% url 'parents' %}" class="text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-widest">
+                    <i class="fas fa-sync-alt mr-2"></i> Clear Search
+                </a>
+            </div>
+            {% endif %}
+        </div>
         {% endif %}
     </div>
 </div>
 
-<!-- Add Parent Modal -->
 <div id="addParentModal" class="fixed inset-0 bg-gray-600 dark:bg-gray-800 bg-opacity-75 dark:bg-opacity-70 flex items-center justify-center z-50 hidden">
     <div class="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-2xl w-full max-w-md transform scale-95 opacity-0 transition-all duration-300" id="modalBox">
         <div class="flex justify-between items-center mb-6">
@@ -80,7 +132,15 @@
     </div>
 </div>
 
+<style>
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+    .animate-float { display: inline-block; animation: float 3s ease-in-out infinite; }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+</style>
+
 <script>
+
 const modal = document.getElementById('addParentModal');
 const modalBox = document.getElementById('modalBox');
 
@@ -100,5 +160,38 @@ function closeModal() {
     modalBox.classList.remove('scale-100','opacity-100');
     setTimeout(()=>modal.classList.add('hidden'),300);
 }
+
+
+const searchInput = document.getElementById('live-search');
+const resultsContainer = document.getElementById('results-container');
+const spinner = document.getElementById('search-spinner');
+let debounceTimer;
+
+searchInput.addEventListener('input', function() {
+    clearTimeout(debounceTimer);
+    const query = this.value;
+    spinner.classList.remove('hidden');
+
+    debounceTimer = setTimeout(() => {
+        fetch(`?q=${query}`, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+           
+            resultsContainer.innerHTML = doc.getElementById('results-container').innerHTML;
+            document.getElementById('total-count').innerHTML = doc.getElementById('total-count').innerHTML;
+            
+            spinner.classList.add('hidden');
+        })
+        .catch(error => {
+            console.error('Search error:', error);
+            spinner.classList.add('hidden');
+        });
+    }, 300);
+});
 </script>
 {% endblock %}

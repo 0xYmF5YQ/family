@@ -6,7 +6,7 @@ from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 from django.dispatch import receiver
 
-class Parents(models.Model):
+"""class Parents(models.Model):
     name = models.CharField(max_length=200)
     gender = models.CharField(max_length=10, choices=[('M', 'Male'), ('F', 'Female')])
     birth_date = models.DateField(null=True, blank=True)
@@ -42,30 +42,59 @@ def create_user_for_parent(sender, instance, created, **kwargs):
 class Children(models.Model):
     parent = models.ForeignKey(Parents, on_delete=models.CASCADE, related_name='children')
     name = models.CharField(max_length=100)
+    gender = models.CharField(max_length=10, choices=[('M', 'Male'), ('F', 'Female')], default='M')
     birth_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True)
+
     class Meta:
         verbose_name_plural = "Children"
 
     def __str__(self):
         return f"{self.name} (Child of {self.parent.name})"
-    
+
+    def convert_to_parent(self):
+        
+        
+        parent_exists = Parents.objects.filter(name=self.name, birth_date=self.birth_date).first()
+        if not parent_exists:
+            return Parents.objects.create(
+                name=self.name,
+                gender=self.gender,
+                birth_date=self.birth_date,
+                parent=self.parent, 
+                user=self.user
+            )
+        return parent_exists
+
 @receiver(post_save, sender=Children)
 def create_user_for_child(sender, instance, created, **kwargs):
-    if created:
-        birth_year = instance.birth_date.year if instance.birth_date else "0000"
-        base_username = instance.name.strip()
+    if created and not instance.user:
+        b_date = instance.birth_date
+        
+        if isinstance(b_date, str):
+            try:
+                birth_year = b_date.split('-')[0]
+            except (IndexError, AttributeError):
+                birth_year = "0000"
+        elif b_date and hasattr(b_date, 'year'):
+            birth_year = b_date.year
+        else:
+            birth_year = "0000"
+        base_username = instance.name.replace(" ", "_").lower()
         username = base_username
         count = 1
-        while User.objects.filter(username__iexact=username).exists():
-            username = f"{base_username} ({count})"
+        while User.objects.filter(username=username).exists():
+            username = f"{base_username}_{count}"
             count += 1
-        User.objects.create_user(
+            
+        new_user = User.objects.create_user(
             username=username,
-            password=str(birth_year)
+            password=str(birth_year),
+            first_name=instance.name.upper() 
         )
-
+        Children.objects.filter(pk=instance.pk).update(user=new_user)
+"""
 
 class EventType(models.Model):
     name = models.CharField(max_length=100, unique=True) 

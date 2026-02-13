@@ -9,6 +9,26 @@
             <h2 class="text-4xl font-extrabold text-slate-900 dark:text-slate-200 tracking-tight">Children Directory</h2>
             <p class="text-slate-500 dark:text-slate-400 text-lg">View all registered children and their family connections.</p>
         </div>
+
+        <div class="w-full md:w-96">
+            <div class="relative group">
+                <input 
+                    type="text" 
+                    id="live-search"
+                    name="q" 
+                    placeholder="Search child name..." 
+                    value="{{ query|default:'' }}"
+                    class="w-full pl-12 pr-4 py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all shadow-sm group-hover:shadow-md dark:text-slate-200"
+                    autocomplete="off"
+                >
+                <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+                    <i class="fas fa-search text-lg"></i>
+                </div>
+                <div id="search-spinner" class="absolute right-4 top-1/2 -translate-y-1/2 hidden">
+                    <i class="fas fa-circle-notch fa-spin text-indigo-500"></i>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
@@ -20,14 +40,14 @@
             </div>
             <div>
                 <p class="text-indigo-100 dark:text-indigo-200 font-medium uppercase tracking-wider text-xs">Total Children</p>
-                <h3 class="text-4xl font-black">{{ children|length }}</h3>
+                <h3 class="text-4xl font-black" id="total-count">{{ children|length }}</h3>
             </div>
         </div>
     </div>
 
-    <div class="bg-white dark:bg-slate-900 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 p-10 mb-8">
+    <div id="results-container" class="bg-white dark:bg-slate-900 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 p-10 mb-8 min-h-[400px]">
         {% if children %}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
             {% for child in children %}
             <div class="group relative bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 p-6 rounded-2xl flex justify-between items-center hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 overflow-hidden">
                 <div class="flex items-center gap-5">
@@ -54,11 +74,96 @@
             {% endfor %}
         </div>
         {% else %}
-        <div class="text-center py-24">
-            <div class="text-slate-200 dark:text-slate-400 mb-6"><i class="fas fa-child text-8xl"></i></div>
-            <p class="text-slate-400 dark:text-slate-500 mt-2">There are currently no children registered in the system.</p>
+        <div class="text-center py-24 animate-fade-in">
+            <div class="relative inline-block mb-6">
+                <div class="text-slate-200 dark:text-slate-700">
+                    <i class="fas fa-search text-8xl animate-float"></i>
+                </div>
+                <div class="absolute -top-2 -right-2 h-10 w-10 bg-indigo-500 text-white rounded-full flex items-center justify-center shadow-lg animate-bounce">
+                    <i class="fas fa-question text-sm"></i>
+                </div>
+            </div>
+            
+            <h3 class="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-2">No matching records</h3>
+            
+            {% if suggestion %}
+            <div class="mb-4 p-4 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl inline-block border border-indigo-100 dark:border-indigo-800">
+                <p class="text-slate-600 dark:text-slate-300 font-medium">
+                    Did you mean: 
+                    <a href="?q={{ suggestion }}" class="text-indigo-600 dark:text-indigo-400 font-black hover:underline decoration-2 underline-offset-4">
+                        {{ suggestion }}
+                    </a>?
+                </p>
+            </div>
+            {% else %}
+            <p class="text-slate-400 dark:text-slate-500 max-w-xs mx-auto italic font-medium">
+                We couldn't find any children linked to a parent named <span class="text-indigo-500 font-bold">"{{ query }}"</span>.
+            </p>
+            {% endif %}
+            
+            <div class="mt-8">
+                <a href="{% url 'children' %}" class="inline-flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-black uppercase text-[10px] tracking-widest hover:gap-4 transition-all">
+                    Clear filters <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
         </div>
         {% endif %}
     </div>
 </div>
+
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+        animation: fadeIn 0.4s ease-out forwards;
+    }
+    .animate-float {
+        display: inline-block;
+        animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-15px); }
+    }
+</style>
+
+<script>
+    const searchInput = document.getElementById('live-search');
+    const resultsContainer = document.getElementById('results-container');
+    const spinner = document.getElementById('search-spinner');
+    let debounceTimer;
+
+    searchInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        const query = this.value;
+        spinner.classList.remove('hidden');
+
+        debounceTimer = setTimeout(() => {
+            fetch(`?q=${query}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                
+                // Update the results grid
+                const newResults = doc.getElementById('results-container').innerHTML;
+                resultsContainer.innerHTML = newResults;
+                
+                // Update the total count badge
+                const newCount = doc.getElementById('total-count').innerHTML;
+                document.getElementById('total-count').innerHTML = newCount;
+                
+                spinner.classList.add('hidden');
+            })
+            .catch(error => {
+                console.error('Search error:', error);
+                spinner.classList.add('hidden');
+            });
+        }, 300);
+    });
+</script>
 {% endblock %}

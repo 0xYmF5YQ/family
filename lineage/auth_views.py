@@ -3,7 +3,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import User, AuthenticationForm
 from django.contrib import messages
 from .forms import LoginForm
-from .models import Parents, Children
+#from .models import Parents, Children
 
 
 def login_view(request):

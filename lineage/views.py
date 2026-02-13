@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Parents, Children, Contribution, Asset, Event
-from .forms import ParentForm, ChildForm, ContributionForm, EventForm, AssetForm, OwnerForm
+#from .models import Parents, Children, 
+from .models import Contribution, Asset, Event
+#from .forms import ParentForm, ChildForm
+from .forms import ContributionForm, EventForm, AssetForm, OwnerForm
 from django.db.models import Sum
 from django.contrib import messages
 from lineage import models
@@ -12,6 +14,9 @@ from itertools import chain
 from operator import attrgetter
 from django.core.paginator import Paginator
 from django.utils.timesince import timesince
+from datetime import datetime
+import difflib
+from django.db.models import Q
 
 @login_required
 def login(request):
@@ -19,15 +24,15 @@ def login(request):
 
 
 def dashboard(request):
-    total_parents = Parents.objects.count()
-    total_children = Children.objects.count()
+    #total_parents = Parents.objects.count()
+    #total_children = Children.objects.count()
     total_assets = Asset.objects.count()
     upcoming_event = Event.objects.filter(date__gte=timezone.now()).order_by('date').first()
 
     recent_contribs = Contribution.objects.select_related('event').all().order_by('-created_at')
     recent_assets = Asset.objects.all().order_by('-created_at')
-    recent_children = Children.objects.select_related('parent').all().order_by('-created_at')
-    recent_parents = Parents.objects.all().order_by('-created_at')
+    #recent_children = Children.objects.select_related('parent').all().order_by('-created_at')
+    #recent_parents = Parents.objects.all().order_by('-created_at')
 
     combined_activities = []
     for c in recent_contribs:
@@ -50,34 +55,34 @@ def dashboard(request):
             'location': a.location or 'Unknown',
             'created_at': a.created_at,
         })
-    for ch in recent_children:
+   # for ch in recent_children:
         combined_activities.append({
             'type': 'child',
-            'name': ch.name,
+          #  'name': ch.name,
             'amount': None,
             'event_name': '',
             'asset_name': '',
-            'location': ch.parent.name if ch.parent else 'Unknown',
-            'created_at': ch.created_at,
+           # 'location': ch.parent.name if ch.parent else 'Unknown',
+            #'created_at': ch.created_at,
         })
-    for p in recent_parents:
+    #for p in recent_parents:
         combined_activities.append({
             'type': 'parent',
-            'name': p.name,
+           # 'name': p.name,
             'amount': None,
             'event_name': '',
             'asset_name': '',
             'location': '',
-            'created_at': p.created_at,
+            #'created_at': p.created_at,
         })
 
-    combined_activities.sort(key=lambda x: x['created_at'], reverse=True)
+    #combined_activities.sort(key=lambda x: x['created_at'], reverse=True)
 
     recent_activities = combined_activities[:5]
 
     context = {
-        'total_parents': total_parents,
-        'total_children': total_children,
+        #'total_parents': total_parents,
+        #'total_children': total_children,
         'total_assets': total_assets,
         'upcoming_event': upcoming_event,
         'recent_activities': recent_activities,
@@ -165,23 +170,37 @@ def recent_activities_api(request):
         'has_next': has_next,
     })
 
+def family(request):
+    context = {}
+    return render(request, 'lineage/family.html', context)
 
-
-def parent(request):
-    all_parents = Parents.objects.all().order_by('-id')
-
+"""def parent(request):
+    query = request.GET.get('q', '').strip()
+    suggestion = None
     if request.method == 'POST':
         form = ParentForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, "Parent added successfully!")
-            return redirect('parents') 
+            return redirect('parents')
     else:
         form = ParentForm()
+    all_parents = Parents.objects.all().order_by('-id')
 
+    if query:
+        filtered_parents = all_parents.filter(name__icontains=query)
+        if not filtered_parents.exists():
+            names_pool = list(Parents.objects.values_list('name', flat=True))
+            matches = difflib.get_close_matches(query, names_pool, n=1, cutoff=0.6)
+            if matches:
+                suggestion = matches[0]
+        
+        all_parents = filtered_parents
     context = {
         'all_parents': all_parents,
         'form': form,
+        'query': query,
+        'suggestion': suggestion,
     }
     return render(request, 'lineage/parents.html', context)
 
@@ -208,21 +227,31 @@ def parent_detail(request, pk):
         
     })
 
-
-
-
 def children(request):
-    all_children = Children.objects.select_related('parent').all().order_by('name')
+    query = request.GET.get('q', '').strip()
+    suggestion = None
+    children_list = Children.objects.select_related('parent__parent__parent').all().order_by('name')
+
+    if query:
+        children_list = children_list.filter(
+            Q(name__icontains=query) | Q(parent__name__icontains=query)
+        )
+        if not children_list.exists():
+            all_child_names = list(Children.objects.values_list('name', flat=True))
+            matches = difflib.get_close_matches(query, all_child_names, n=1, cutoff=0.6)
+            if matches:
+                suggestion = matches[0]
+
+    context = {
+        'children': children_list,
+        'suggestion': suggestion,
+        'query': query
+    }
     
-    return render(request, 'lineage/children.html', {
-        'children': all_children
-    })
+    return render(request, 'lineage/children.html', context)
 
 def child_detail(request, pk):
-   
-    child = get_object_or_404(Children, pk=pk)
-    
-   
+    child = get_object_or_404(Children.objects.select_related('parent__parent__parent'), pk=pk)
     siblings = []
     if child.parent:
         siblings = Children.objects.filter(parent=child.parent).exclude(id=child.id)
@@ -231,11 +260,33 @@ def child_detail(request, pk):
         'child': child,
         'parent': child.parent,
         'siblings': siblings,
-        
     })
 
-
-
+def add_grandchild(request, pk):
+    ancestor_child = get_object_or_404(Children, pk=pk)
+    
+    if request.method == 'POST':
+        new_parent_record = ancestor_child.convert_to_parent()
+        name = request.POST.get('name')
+        gender = request.POST.get('gender')
+        birth_date_raw = request.POST.get('birth_date')
+        try:
+            birth_date_obj = datetime.strptime(birth_date_raw, '%Y-%m-%d').date()
+        except (ValueError, TypeError):
+            messages.error(request, "Invalid date format. Please use the date picker.")
+            return redirect('child_detail', pk=pk)
+        new_baby = Children.objects.create(
+            parent=new_parent_record, 
+            name=name,
+            gender=gender,
+            birth_date=birth_date_obj 
+        )
+        
+        messages.success(request, f"Promotion successful! {ancestor_child.name} is now a Parent, and {new_baby.name} has been added.")
+        return redirect('child_detail', pk=pk)
+    
+    return redirect('child_detail', pk=pk)
+"""
 def contributions(request):
    
     today = timezone.now().date()

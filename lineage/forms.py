@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
-from .models import Parents, Children
+#from .models import Parents, Children
 from .models import Contribution, Event, Family, EventType, AssetCategory
 from .models import Asset, Owner
 
@@ -45,7 +45,7 @@ class LoginForm(AuthenticationForm):
         return cleaned_data
       
 
-class ParentForm(forms.ModelForm):
+"""class ParentForm(forms.ModelForm):
     class Meta:
         model = Parents
         fields = ['name', 'birth_date', 'parent'] 
@@ -73,8 +73,6 @@ class ParentForm(forms.ModelForm):
 
         self.fields['parent'].required = False 
         self.fields['parent'].label = "Parent (optional)"
-
-
 class ChildForm(forms.ModelForm):
     class Meta:
         model = Children
@@ -93,8 +91,7 @@ class ChildForm(forms.ModelForm):
                 'class': 'w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400',
             }),
         }
-
-
+"""
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event

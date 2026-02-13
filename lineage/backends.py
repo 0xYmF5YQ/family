@@ -1,6 +1,6 @@
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.models import User
-from .models import Parents, Children
+#from .models import Parents, Children
 
 class FamilyNameBackend(ModelBackend):
     def authenticate(self, request, username=None, password=None, **kwargs):

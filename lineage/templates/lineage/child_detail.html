@@ -4,7 +4,7 @@
 {% block content %}
 <div class="max-w-[95%] mx-auto py-8 transition-all duration-700 animate-in px-4">
 
-    <div class="mb-8">
+    <div class="mb-8 flex justify-between items-center">
         <a href="{% url 'children' %}" class="group inline-flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium">
             <i class="fas fa-chevron-left group-hover:-translate-x-1 transition-transform"></i> Back to Directory
         </a>
@@ -12,7 +12,7 @@
 
     <div class="grid grid-cols-1 xl:grid-cols-4 gap-10">
 
-        <div class="xl:col-span-1">
+        <div class="xl:col-span-1 space-y-6">
             <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-10 shadow-sm border border-slate-100 dark:border-slate-700 text-center sticky top-8">
                 <div class="w-32 h-32 bg-indigo-600 dark:bg-indigo-500 text-white rounded-[2rem] flex items-center justify-center text-5xl mx-auto mb-6 shadow-2xl shadow-indigo-200 dark:shadow-indigo-800 rotate-3 group hover:rotate-0 transition-transform duration-500">
                     <i class="fas fa-child"></i>
@@ -26,31 +26,64 @@
                     </span>
                 </div>
             </div>
+
+            <div class="bg-emerald-600 dark:bg-emerald-700 text-white rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden group">
+                <div class="relative z-10 space-y-4">
+                    <div>
+                        <h3 class="text-emerald-100 uppercase text-[10px] font-black tracking-[0.2em] mb-1">The Legacy</h3>
+                        <p class="text-xl font-black leading-tight">Add {{ child.name }}'s Child</p>
+                    </div>
+                    
+                    <button onclick="toggleModal()" class="w-full bg-white text-emerald-700 hover:bg-emerald-50 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-xl flex items-center justify-center gap-2">
+                        <i class="fas fa-plus-circle"></i> Add Next Gen
+                    </button>
+                    
+                    <p class="text-[10px] text-emerald-100 opacity-70 text-center leading-relaxed">
+                        This promotes {{ child.name }} to a Parent record.
+                    </p>
+                </div>
+                <i class="fas fa-seedling absolute -bottom-4 -right-4 text-7xl text-white/10 group-hover:scale-110 transition-transform duration-700"></i>
+            </div>
         </div>
 
         <div class="xl:col-span-3 space-y-8">
+            <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-10 shadow-sm border border-slate-100 dark:border-slate-700">
+                <h3 class="text-slate-800 dark:text-slate-200 text-2xl font-black tracking-tight mb-8 flex items-center gap-3">
+                    <span class="h-10 w-10 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-xl flex items-center justify-center text-sm">
+                        <i class="fas fa-tree"></i>
+                    </span>
+                    Lineage from Usunye
+                </h3>
 
-            <div class="bg-indigo-900 dark:bg-indigo-800 text-white rounded-[2.5rem] p-10 shadow-2xl shadow-indigo-100 dark:shadow-indigo-700 relative overflow-hidden group">
-                <div class="relative z-10">
-                    <h3 class="text-indigo-300 dark:text-indigo-200 uppercase text-xs font-black tracking-[0.2em] mb-4">Primary Parent / Guardian</h3>
-                    {% if parent %}
-                        <div class="flex flex-col md:flex-row items-end justify-between gap-4">
-                            <div>
-                                <p class="text-3xl font-black tracking-tight mb-2">{{ parent.name }}</p>
-                                <p class="text-indigo-300 dark:text-indigo-200 text-lg flex items-center gap-2">
-                                    <i class="fas fa-history text-sm"></i> Registered: {{ parent.birth_date|date:"Y" }}
-                                </p>
-                            </div>
-                            <a href="{% url 'parent_detail' parent.id %}" class="bg-white/10 dark:bg-white/20 hover:bg-white/20 dark:hover:bg-white/30 backdrop-blur-md text-white dark:text-white px-6 py-3 rounded-2xl font-bold transition-all flex items-center gap-3 group">
-                                View Full Parent Profile
-                                <i class="fas fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
-                            </a>
-                        </div>
-                    {% else %}
-                        <p class="text-2xl italic text-indigo-300 dark:text-indigo-200">No parent assigned to this record.</p>
+                <div class="relative pl-8 border-l-2 border-dashed border-slate-200 dark:border-slate-700 space-y-12 ml-4">
+                    {% if child.parent.parent.parent %}
+                    <div class="relative">
+                        <div class="absolute -left-[41px] top-0 h-4 w-4 rounded-full bg-amber-500 border-4 border-white dark:border-slate-900"></div>
+                        <p class="text-[10px] font-black uppercase text-amber-600 tracking-widest mb-1">Great-Grandfather</p>
+                        <h4 class="text-xl font-bold text-slate-800 dark:text-slate-200">{{ child.parent.parent.parent.name }}</h4>
+                    </div>
                     {% endif %}
+
+                    {% if child.parent.parent %}
+                    <div class="relative">
+                        <div class="absolute -left-[41px] top-0 h-4 w-4 rounded-full bg-indigo-500 border-4 border-white dark:border-slate-900"></div>
+                        <p class="text-[10px] font-black uppercase text-indigo-500 tracking-widest mb-1">Grandfather</p>
+                        <h4 class="text-xl font-bold text-slate-800 dark:text-slate-200">{{ child.parent.parent.name }}</h4>
+                    </div>
+                    {% endif %}
+
+                    <div class="relative">
+                        <div class="absolute -left-[41px] top-0 h-4 w-4 rounded-full bg-slate-400 border-4 border-white dark:border-slate-900"></div>
+                        <p class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">Parent</p>
+                        <h4 class="text-xl font-bold text-slate-800 dark:text-slate-200">{{ child.parent.name }}</h4>
+                    </div>
+
+                    <div class="relative">
+                        <div class="absolute -left-[41px] top-0 h-4 w-4 rounded-full bg-indigo-600 border-4 border-white dark:border-slate-900"></div>
+                        <p class="text-[10px] font-black uppercase text-indigo-600 tracking-widest mb-1">Current Profile</p>
+                        <h4 class="text-2xl font-black text-indigo-600 dark:text-indigo-400">{{ child.name }}</h4>
+                    </div>
                 </div>
-                <i class="fas fa-user-tie absolute -bottom-8 -right-8 text-[12rem] text-white/5 dark:text-white/10 group-hover:scale-110 transition-transform duration-700"></i>
             </div>
 
             <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-10 shadow-sm border border-slate-100 dark:border-slate-700">
@@ -59,7 +92,7 @@
                         <span class="h-10 w-10 bg-indigo-50 dark:bg-indigo-800 text-indigo-500 dark:text-indigo-200 rounded-xl flex items-center justify-center text-sm">
                             <i class="fas fa-users"></i>
                         </span>
-                        Family Siblings
+                        Siblings
                     </h3>
                     <span class="text-slate-400 dark:text-slate-500 font-bold text-sm uppercase tracking-widest">{{ siblings|length }} Registered</span>
                 </div>
@@ -72,23 +105,68 @@
                                 <i class="fas fa-child"></i>
                             </div>
                             <div>
-                                <span class="block font-bold text-lg text-slate-800 dark:text-slate-200 group-hover:text-indigo-900 dark:group-hover:text-indigo-300">{{ sibling.name }}</span>
+                                <span class="block font-bold text-lg text-slate-800 dark:text-slate-200">{{ sibling.name }}</span>
                                 <span class="text-xs text-slate-400 dark:text-slate-500 font-medium">Sibling Record</span>
                             </div>
                         </div>
-                        <a href="{% url 'child_detail' sibling.id %}" class="px-5 py-2 bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-200 rounded-xl text-xs font-black uppercase tracking-wider shadow-sm border border-slate-100 dark:border-slate-700 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500 dark:hover:text-white transition-all">
+                        <a href="{% url 'child_detail' sibling.id %}" class="px-5 py-2 bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-200 rounded-xl text-xs font-black uppercase tracking-wider shadow-sm border border-slate-100 dark:border-slate-700 hover:bg-indigo-600 hover:text-white transition-all">
                             Switch Profile
                         </a>
                     </div>
                     {% empty %}
                     <div class="col-span-full p-12 text-center bg-slate-50/50 dark:bg-slate-800/50 rounded-[2rem] border border-dashed border-slate-200 dark:border-slate-700">
                         <div class="text-slate-200 dark:text-slate-500 mb-4"><i class="fas fa-users-slash text-5xl"></i></div>
-                        <p class="text-slate-400 dark:text-slate-500 italic text-lg font-medium">This child has no other registered siblings in the system.</p>
+                        <p class="text-slate-400 dark:text-slate-500 italic text-lg font-medium">No other siblings found.</p>
                     </div>
                     {% endfor %}
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+<div id="grandchildModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300">
+    
+    <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-[2.5rem] p-10 shadow-2xl transform transition-all scale-95 opacity-0" id="modalCard">
+        <div class="flex justify-between items-start mb-6">
+            <div class="h-12 w-12 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 rounded-xl flex items-center justify-center">
+                <i class="fas fa-baby"></i>
+            </div>
+            <button onclick="toggleModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <h3 class="text-2xl font-black text-slate-900 dark:text-slate-100 mb-1">New Generation</h3>
+        <p class="text-slate-500 dark:text-slate-400 text-sm mb-8 font-medium">Registering a child for <strong>{{ child.name }}</strong></p>
+
+        <form method="POST" action="{% url 'add_grandchild' child.id %}">
+            {% csrf_token %}
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-2">Full Name</label>
+                    <input type="text" name="name" placeholder="Enter name..." required 
+                           class="w-full px-6 py-4 rounded-2xl border border-slate-100 dark:border-slate-800 dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-2">Gender</label>
+                        <select name="gender" class="w-full px-6 py-4 rounded-2xl border border-slate-100 dark:border-slate-800 dark:bg-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="M">Male</option>
+                            <option value="F">Female</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-2">Birth Date</label>
+                        <input type="date" name="birth_date" required 
+                               class="w-full px-4 py-4 rounded-2xl border border-slate-100 dark:border-slate-800 dark:bg-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500 text-sm">
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-4 rounded-2xl shadow-lg shadow-emerald-200 dark:shadow-none transition-all mt-4 transform hover:-translate-y-1">
+                    Confirm Registration
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -101,4 +179,34 @@
         animation: slideInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 </style>
+
+<script>
+    function toggleModal() {
+        const modal = document.getElementById('grandchildModal');
+        const card = document.getElementById('modalCard');
+        
+        if (modal.classList.contains('hidden')) {
+            
+            modal.classList.remove('hidden');
+            
+            setTimeout(() => {
+                card.classList.remove('scale-95', 'opacity-0');
+                card.classList.add('scale-100', 'opacity-100');
+            }, 20);
+        } else {
+           
+            card.classList.remove('scale-100', 'opacity-100');
+            card.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+    }
+    window.onclick = function(event) {
+        const modal = document.getElementById('grandchildModal');
+        if (event.target == modal) {
+            toggleModal();
+        }
+    }
+</script>
 {% endblock %}

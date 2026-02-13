@@ -8,14 +8,16 @@ urlpatterns = [
 
 
     path('dashboard/', views.dashboard, name='dashboard'),
-    #path('dashboard/activities/json/<int:page>/', views.dashboard_activities_json, name='dashboard_activities_json'),
     path('api/recent-activities/', views.recent_activities_api, name='recent_activities_api'),
 
-    path('parents/', views.parent, name='parents'),
-    path('parents/<int:pk>/', views.parent_detail, name='parent_detail'),
+    path('family/', views.family, name='family'),
 
-    path('children/', views.children, name='children'),
-    path('children/<int:pk>/', views.child_detail, name='child_detail'),
+    #path('parents/', views.parent, name='parents'),
+    #path('parents/<int:pk>/', views.parent_detail, name='parent_detail'),
+
+    #path('children/', views.children, name='children'),
+    #path('children/<int:pk>/', views.child_detail, name='child_detail'),
+    #path('child/<int:pk>/add-grandchild/', views.add_grandchild, name='add_grandchild'),
 
     path('contributions/', views.contributions, name='contributions'),
     path('events/add/', views.add_event, name='add_event'),
@@ -28,7 +30,6 @@ urlpatterns = [
     path('assets/<int:asset_id>/add_owner/', views.add_owner, name='add_owner'),
 
     path('login/', auth_views.login_view, name='login'),
-    #path('signup/', auth_views.signup_view, name='signup'),
     path('logout/', auth_views.logout_view, name='logout'),
 
     
