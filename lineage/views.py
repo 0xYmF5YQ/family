@@ -19,7 +19,7 @@ import difflib
 from django.db.models import Q
 
 @login_required
-def login(request):
+def home(request):
     return redirect('dashboard')
 
 

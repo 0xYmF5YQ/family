@@ -5,7 +5,7 @@ from . import auth_views
 urlpatterns = [
   
     path('', auth_views.login_view, name='login'),
-
+    path('home', views.home, name='home'),
 
     path('dashboard/', views.dashboard, name='dashboard'),
     path('api/recent-activities/', views.recent_activities_api, name='recent_activities_api'),
