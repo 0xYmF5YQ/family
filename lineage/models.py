@@ -6,33 +6,32 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.core.exceptions import ValidationError
 
 
 # -------------------------
 # PERSON
 # -------------------------
 class Person(models.Model):
-    GENDER_CHOICES = [('M', 'Male'), ('F', 'Female')]
-    STATUS_CHOICES = [('alive', 'Alive'), ('deceased', 'Deceased')]
-    JOB_CHOICES = [('employed', 'Employed'), ('unemployed', 'Unemployed')]
+    GENDER_CHOICES = [("M", "Male"), ("F", "Female")]
+    STATUS_CHOICES = [("alive", "Alive"), ("deceased", "Deceased")]
+    JOB_CHOICES = [("employed", "Employed"), ("unemployed", "Unemployed")]
     DISABILITY_CHOICES = [
-        ('none', 'None'),
-        ('physical', 'Physical'),
-        ('mental', 'Mental'),
+        ("none", "None"),
+        ("physical", "Physical"),
+        ("mental", "Mental"),
     ]
 
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     birth_date = models.DateField(null=True, blank=True)
 
-    status = models.CharField(
-        max_length=20, choices=STATUS_CHOICES, default='alive'
-    )
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="alive")
     job_status = models.CharField(
-        max_length=20, choices=JOB_CHOICES, default='unemployed'
+        max_length=20, choices=JOB_CHOICES, default="unemployed"
     )
     disability_status = models.CharField(
-        max_length=20, choices=DISABILITY_CHOICES, default='none'
+        max_length=20, choices=DISABILITY_CHOICES, default="none"
     )
 
     gender = models.CharField(
@@ -43,26 +42,37 @@ class Person(models.Model):
     )
 
     father = models.ForeignKey(
-        'self', null=True, blank=True,
-        related_name='children_from_father',
-        on_delete=models.SET_NULL
+        "self",
+        null=True,
+        blank=True,
+        related_name="children_from_father",
+        on_delete=models.SET_NULL,
     )
 
     mother = models.ForeignKey(
-        'self', null=True, blank=True,
-        related_name='children_from_mother',
-        on_delete=models.SET_NULL
-    )
-
-    spouse = models.OneToOneField(
-        'self',
+        "self",
         null=True,
         blank=True,
-        related_name='married_to',
-        on_delete=models.SET_NULL
+        related_name="children_from_mother",
+        on_delete=models.SET_NULL,
     )
 
-    photo = models.ImageField(upload_to='members/', null=True, blank=True)
+    def clean(self):
+        if self.father and self.father.gender != "M":
+            raise ValidationError("Father must be male.")
+
+        if self.mother and self.mother.gender != "F":
+            raise ValidationError("Mother must be female.")
+
+    spouse = models.OneToOneField(
+        "self",
+        null=True,
+        blank=True,
+        related_name="married_to",
+        on_delete=models.SET_NULL,
+    )
+
+    photo = models.ImageField(upload_to="members/", null=True, blank=True)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
@@ -84,9 +94,7 @@ class Person(models.Model):
     # DESCENDANTS (DRY)
     # -------------------------
     def get_children(self):
-        return Person.objects.filter(
-            Q(father=self) | Q(mother=self)
-        ).distinct()
+        return Person.objects.filter(Q(father=self) | Q(mother=self)).distinct()
 
     def _get_descendants(self, depth):
         current_generation = self.get_children()
@@ -167,10 +175,7 @@ class Event(models.Model):
 
     @property
     def total_contributed(self):
-        return (
-            self.contributions.aggregate(total=Sum('amount'))['total']
-            or 0
-        )
+        return self.contributions.aggregate(total=Sum("amount"))["total"] or 0
 
     @property
     def is_past(self):
@@ -187,11 +192,9 @@ class Event(models.Model):
 # -------------------------
 class Contribution(models.Model):
     event = models.ForeignKey(
-        Event,
-        related_name="contributions",
-        on_delete=models.CASCADE
+        Event, related_name="contributions", on_delete=models.CASCADE
     )
-    member = models.ForeignKey(User, on_delete=models.CASCADE)
+    member = models.ForeignKey(Person, on_delete=models.CASCADE, null=True, blank=True)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     contributed_at = models.DateTimeField(auto_now_add=True)
 
@@ -203,26 +206,41 @@ class Contribution(models.Model):
 # ASSETS
 # -------------------------
 class Asset(models.Model):
+    ASSET_CATEGORY = [("D", "Dispute"), ("O", "Owned")]
     title = models.CharField(max_length=200)
-    category = models.ForeignKey(
-        'AssetCategory',  # Assuming you have an AssetCategory model defined elsewhere
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='assets'
+    status = models.CharField(
+        max_length=20, choices=ASSET_CATEGORY, default="O", null=False
     )
-
     valuation = models.DecimalField(max_digits=15, decimal_places=2)
     location = models.CharField(max_length=200, blank=True, null=True)
     size = models.CharField(max_length=100, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    owners = models.ForeignKey(Person, on_delete=models.CASCADE)
 
     def total_contributed(self):
-        return self.owners.aggregate(
-            total=Sum('share')
-        )['total'] or 0
+        return self.owners.aggregate(total=Sum("share"))["total"] or 0
 
     def __str__(self):
         category = self.category.name if self.category else "No Category"
         return f"{self.title} ({category})"
+
+
+class AssetOwnership(models.Model):
+    asset = models.ForeignKey(
+        Asset,
+        related_name="ownerships",
+        on_delete=models.CASCADE,
+    )
+    owner = models.ForeignKey(
+        Person,
+        on_delete=models.CASCADE,
+    )
+    share = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        help_text="Ownership percentage",
+    )
+
+    def __str__(self):
+        return f"{self.owner} owns {self.share}% of {self.asset}"
