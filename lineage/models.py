@@ -207,23 +207,24 @@ class Contribution(models.Model):
 # -------------------------
 class Asset(models.Model):
     ASSET_CATEGORY = [("D", "Dispute"), ("O", "Owned")]
+
     title = models.CharField(max_length=200)
-    status = models.CharField(
-        max_length=20, choices=ASSET_CATEGORY, default="O", null=False
-    )
+    status = models.CharField(max_length=20, choices=ASSET_CATEGORY, default="O")
     valuation = models.DecimalField(max_digits=15, decimal_places=2)
     location = models.CharField(max_length=200, blank=True, null=True)
     size = models.CharField(max_length=100, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    owners = models.ForeignKey(Person, on_delete=models.CASCADE)
 
-    def total_contributed(self):
-        return self.owners.aggregate(total=Sum("share"))["total"] or 0
+    owners = models.ManyToManyField(
+        Person, through="AssetOwnership", related_name="assets"
+    )
+
+    def total_ownership_percentage(self):
+        return self.ownerships.aggregate(total=Sum("share"))["total"] or 0
 
     def __str__(self):
-        category = self.category.name if self.category else "No Category"
-        return f"{self.title} ({category})"
+        return f"{self.title} ({self.get_status_display()})"
 
 
 class AssetOwnership(models.Model):
