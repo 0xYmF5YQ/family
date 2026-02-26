@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import User, AuthenticationForm
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from .forms import LoginForm
 #from .models import Parents, Children
 
@@ -11,7 +13,7 @@ def login_view(request):
         
         name = request.POST.get('name', '').strip()
         birth_year = request.POST.get('birth_year', '').strip()
-        password = request.POST.get('password', '').strip()
+        password = request.POST.get('password', '')
 
         user = None
         if name and birth_year:
@@ -37,6 +39,8 @@ def login_view(request):
             
     return render(request, 'auth/login.html')
 
+@login_required         
+@require_POST 
 def logout_view(request):
     logout(request)
     messages.info(request, "You have been logged out.")
