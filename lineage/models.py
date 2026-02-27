@@ -80,15 +80,18 @@ class Person(models.Model):
     # -------------------------
     # ANCESTORS
     # -------------------------
-    def get_father_ancestors(self, max_depth=5):
-        ancestors, current, depth = [], self.father, 0
+    def get_father_ancestor(self, level):
 
-        while current and depth < max_depth:
-            ancestors.append(current)
+        current = self
+        for _ in range(level):
+            if not current.father:
+                return None
             current = current.father
-            depth += 1
+        return current
 
-        return ancestors
+    @property
+    def great_grandfather(self):
+        return self.get_father_ancestor(3)
 
     # -------------------------
     # DESCENDANTS (DRY)
