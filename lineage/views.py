@@ -233,3 +233,30 @@ def recent_activities_api(request):
         )
 
     return JsonResponse({"activities": activities})
+
+
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+
+
+def get_lineage(request, pk):
+    person = get_object_or_404(Person, pk=pk)
+    father = person.father
+    grandfather = person.get_father_ancestor(2)
+    great_grandfather = person.get_father_ancestor(3)
+
+    children = person.get_children()
+    offspring_summary = (
+        ", ".join([f"{child.first_name} {child.last_name}" for child in children])
+        if children
+        else None
+    )
+
+    return JsonResponse(
+        {
+            "grandfather": str(grandfather) if grandfather else None,
+            "great_grandfather": str(great_grandfather) if great_grandfather else None,
+            "offspring_summary": offspring_summary,
+            "father": str(father) if father else None,
+        }
+    )
