@@ -21,4 +21,5 @@ urlpatterns = [
         "recent-activities/", views.recent_activities_api, name="recent_activities_api"
     ),
     path("get-lineage/<int:pk>/", views.get_lineage, name="get_lineage"),
+    
 ]
