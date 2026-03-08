@@ -127,7 +127,7 @@ def person_delete(request, pk):
 
 def event_list(request):
     events = Event.objects.all()
-    return render(request, "lineage/event_list.html", {"events": events})
+    return render(request, "lineage/event.html", {"events": events})
 
 
 def event_create(request):
@@ -164,12 +164,12 @@ def contribution_create(request):
         form.save()
         return redirect("dashboard")
 
-    return render(request, "lineage/form.html", {"form": form})
+    return render(request, "lineage/contributions.html", {"form": form})
 
 
 def asset_list(request):
     assets = Asset.objects.all()
-    return render(request, "lineage/asset_list.html", {"assets": assets})
+    return render(request, "lineage/asset.html", {"assets": assets})
 
 
 def asset_create(request):

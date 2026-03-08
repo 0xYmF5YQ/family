@@ -87,6 +87,15 @@ class Person(models.Model):
             if not current.father:
                 return None
             current = current.father
+
+        return current
+
+    def get_family_root(self):
+        current = self
+
+        while current.father and current.father.father:
+            current = current.father
+
         return current
 
     @property

@@ -64,16 +64,12 @@
                         onclick="showTree('{{ member.id }}', '{{ member.first_name }} {{ member.last_name }}')">
                         <td class="px-8 py-5">
                             <div class="flex items-center gap-4">
-                                <div
-                                    class="h-10 w-10 shrink-0 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">
-                                    {{ member.first_name }}
-                                </div>
                                 <div class="flex flex-col">
                                     <div class="flex items-center gap-2">
                                         <span
                                             class="font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap searchable-name">
-                                            {{ member.last_name }}</span>
-                                        {% if member.gender == 'male' %}
+                                            {{ member.first_name }} {{ member.last_name }}</span>
+                                        {% if member.gender == 'Male' %}
                                         <i class="fas fa-mars text-blue-500 text-xs shrink-0"></i>
                                         {% else %}
                                         <i class="fas fa-venus text-pink-500 text-xs shrink-0"></i>
@@ -86,12 +82,12 @@
                             <span
                                 class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter whitespace-nowrap searchable-type
                                 {% if member.type == 'Parent' %}bg-amber-100 text-amber-700{% else %}bg-sky-100 text-sky-700{% endif %}">
-                                {{ member.get_grandfather }}
+                                {{ member.get_family_root }}
                             </span>
                         </td>
                         <td
                             class="px-8 py-5 text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap searchable-year">
-                            {{ member.date|date:"Y" }}</td>
+                            {{ member.birth_date|date:"Y" }}</td>
                         <td class="px-8 py-5 text-right">
                             <button
                                 class="bg-slate-100 dark:bg-slate-700 h-10 w-10 rounded-xl text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all inline-flex items-center justify-center">
