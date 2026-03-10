@@ -116,7 +116,7 @@ def person_update(request, pk):
         form.save()
         return redirect("person_list")
 
-    return render(request, "lineage/form.html", {"form": form})
+    return render(request, "lineage/profile.html", {"form": form})
 
 
 def person_delete(request, pk):
@@ -260,3 +260,37 @@ def get_lineage(request, pk):
             "father": str(father) if father else None,
         }
     )
+
+
+def get_member_details(request, id):
+    person = get_object_or_404(Person, id=id)
+
+    data = {
+        "id": person.id,
+        "first_name": person.first_name,
+        "last_name": person.last_name,
+        "birth_date": (
+            person.birth_date.strftime("%Y-%m-%d") if person.birth_date else None
+        ),
+        "age": person.get_age(),
+        "gender": person.get_gender_display() if person.gender else None,
+        "status": person.get_status_display(),
+        "job_status": person.get_job_status_display(),
+        "disability_status": person.get_disability_status_display(),
+        "father": str(person.father) if person.father else None,
+        "mother": str(person.mother) if person.mother else None,
+        "spouse": str(person.spouse) if person.spouse else None,
+        "family_root": (
+            str(person.get_family_root()) if person.get_family_root() else None
+        ),
+        "great_grandfather": (
+            str(person.great_grandfather) if person.great_grandfather else None
+        ),
+        "children": [str(child) for child in person.get_children()],
+        "siblings": [str(s) for s in person.get_siblings()],
+        "grandchildren": [str(gc) for gc in person.get_grandchildren()],
+        "great_grandchildren": [str(ggc) for ggc in person.get_great_grandchildren()],
+        "photo_url": person.photo.url if person.photo else None,
+    }
+
+    return JsonResponse(data)

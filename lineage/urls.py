@@ -21,4 +21,9 @@ urlpatterns = [
         "recent-activities/", views.recent_activities_api, name="recent_activities_api"
     ),
     path("get-lineage/<int:pk>/", views.get_lineage, name="get_lineage"),
+    path(
+        "get-member-details/<int:id>/",
+        views.get_member_details,
+        name="get_member_details",
+    ),
 ]
