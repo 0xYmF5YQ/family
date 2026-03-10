@@ -59,7 +59,7 @@
                 <tbody id="directory-body" class="divide-y divide-slate-100 dark:divide-slate-800">
                     {% for member in persons %}
                     <tr class="group hover:bg-white dark:hover:bg-slate-800 transition-all cursor-pointer member-row"
-                        onclick="showProfile('{{ member.id }}')">
+                        onclick="openProfile('{{ member.id }}')">
                         <td class="px-8 py-5">
                             <div class="flex items-center gap-4">
 
@@ -109,7 +109,7 @@
     </div>
 </div>
 
-{% include "lineage/profile.html" %}
+
 
 <div id="addMemberModal"
     class="fixed inset-0 z-[130] flex items-center justify-center hidden bg-slate-900/40 backdrop-blur-sm transition-all duration-300 opacity-0 p-4">
@@ -371,70 +371,60 @@
     }
 
     function openProfile(id) {
-
-        const modal = document.getElementById("profileModal");
-        const content = document.getElementById("profileContent");
-
-        modal.classList.remove("hidden");
-
-        setTimeout(() => {
-            modal.classList.remove("opacity-0");
-            content.classList.remove("opacity-0", "scale-90");
-        }, 10);
-
         fetch(`/get-member-details/${id}/`)
             .then(res => res.json())
             .then(data => {
-
+                // Full name
                 document.getElementById("prof-fullname").textContent =
                     `${data.first_name} ${data.last_name}`;
 
+                // Status badge
                 document.getElementById("prof-status-badge").textContent =
                     data.status || "---";
 
+                // Other fields
                 document.getElementById("prof-birth").textContent =
                     data.birth_date || "---";
-
                 document.getElementById("prof-gender").textContent =
                     data.gender || "---";
-
                 document.getElementById("prof-father").textContent =
                     data.father || "---";
-
                 document.getElementById("prof-mother").textContent =
                     data.mother || "---";
-
                 document.getElementById("prof-spouse").textContent =
                     data.spouse || "---";
-
                 document.getElementById("prof-job").textContent =
                     data.job_status || "---";
-
                 document.getElementById("prof-disability").textContent =
                     data.disability_status || "---";
 
+                // Show the modal
+                const modal = document.getElementById("profileModal");
+                const profileContent = document.getElementById("profileContent");
+                const profItems = document.querySelectorAll(".prof-item");
 
-                // Photo handling
-                const photo = document.getElementById("prof-photo");
-                const initial = document.getElementById("prof-initial");
 
-                if (data.photo_url) {
-                    photo.src = data.photo_url;
-                    photo.classList.remove("hidden");
-                    initial.classList.add("hidden");
-                } else {
-                    photo.classList.add("hidden");
-                    initial.classList.remove("hidden");
-                    initial.textContent = data.first_name[0];
-                }
+                modal.classList.remove("hidden", "opacity-0");
+                profileContent.classList.remove("scale-90", "opacity-0");
 
+                modal.classList.add("opacity-100");
+                profileContent.classList.add("scale-100", "opacity-100");
             })
-            .catch(err => console.error(err));
+            .catch(err => {
+                console.error("Error fetching profile:", err);
+            });
     }
 
     function closeProfile() {
-        const modal = document.getElementById('profileModal');
-        if (modal) modal.classList.add('hidden');
+        const modal = document.getElementById("profileModal");
+        const profileContent = document.getElementById("profileContent");
+
+        profileContent.classList.add("scale-90", "opacity-0");
+        modal.classList.add("opacity-0");
+
+        setTimeout(() => {
+            modal.classList.add("hidden");
+        }, 300);
     }
 
     function showTree(id, name) {
