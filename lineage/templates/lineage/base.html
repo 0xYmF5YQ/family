@@ -118,12 +118,6 @@
                 <i class="fas fa-people-group w-5 group-hover:scale-110 transition"></i> Family
             </a>
 
-            <!-- <a href="#" class="flex items-center gap-3 p-3.5 rounded-2xl font-bold transition-all group
-                {% if request.resolver_match.url_name == 'children' %} bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-none
-                {% else %} text-slate-600 dark:text-slate-300 hover:bg-slate-50 hover:text-indigo-600 dark:hover:bg-slate-700 {% endif %}">
-                <i class="fas fa-child w-5 group-hover:scale-110 transition"></i> Children
-            </a> !-->
-
             <a href="{% url 'contributions' %}"
                 class="flex items-center gap-3 p-3.5 rounded-2xl font-bold transition-all group
                 {% if request.resolver_match.url_name == 'contribution_create' %} bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-none
