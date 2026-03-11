@@ -61,8 +61,46 @@ class EventForm(forms.ModelForm):
             "goal_amount",
             "is_active",
         ]
+
         widgets = {
-            "date": forms.DateInput(attrs={"type": "date"}),
+            "title": forms.TextInput(
+                attrs={
+                    "class": "w-full rounded-xl border p-3 focus:ring-2 focus:ring-indigo-500",
+                    "placeholder": "Enter event title",
+                }
+            ),
+            "type": forms.Select(
+                attrs={
+                    "class": "w-full rounded-xl border p-3 focus:ring-2 focus:ring-indigo-500"
+                }
+            ),
+            "family_name": forms.TextInput(
+                attrs={
+                    "class": "w-full rounded-xl border p-3 focus:ring-2 focus:ring-indigo-500",
+                    "placeholder": "Enter family name",
+                }
+            ),
+            "location": forms.TextInput(
+                attrs={
+                    "class": "w-full rounded-xl border p-3 focus:ring-2 focus:ring-indigo-500",
+                    "placeholder": "Enter location",
+                }
+            ),
+            "date": forms.DateInput(
+                attrs={
+                    "type": "date",
+                    "class": "w-full rounded-xl border p-3 focus:ring-2 focus:ring-indigo-500",
+                }
+            ),
+            "goal_amount": forms.NumberInput(
+                attrs={
+                    "class": "w-full rounded-xl border p-3 focus:ring-2 focus:ring-indigo-500",
+                    "placeholder": "Enter target amount",
+                }
+            ),
+            "is_active": forms.CheckboxInput(
+                attrs={"class": "h-4 w-4 text-indigo-600 rounded focus:ring-indigo-500"}
+            ),
         }
 
     def clean_date(self):
@@ -100,8 +138,45 @@ class AssetForm(forms.ModelForm):
             "description",
             "owners",
         ]
-
-
+    widgets = {
+        "title": forms.TextInput(
+            attrs={
+                "class": "w-full rounded-xl border p-3 focus:ring-2 focus:ring-indigo-500",
+                "placeholder": "Enter asset title",
+            }
+        ),
+        "status": forms.Select(
+            attrs={
+                "class": "w-full rounded-xl border p-3 focus:ring-2 focus:ring-indigo-500"
+            }
+        ),
+        "valuation": forms.NumberInput(
+            attrs={
+                "class": "w-full rounded-xl border p-3 focus:ring-2 focus:ring-indigo-500",
+                "placeholder": "Enter asset valuation",
+            }
+        ),
+        "location": forms.TextInput(
+            attrs={
+                "class": "w-full rounded-xl border p-3 focus:ring-2 focus:ring-indigo-500",
+                "placeholder": "Enter asset location",
+            }
+        ),
+        "size": forms.TextInput(
+            attrs={
+                "class": "w-full rounded-xl border p-3 focus:ring-2 focus:ring-indigo-500",
+                "placeholder": "Enter asset size (e.g. 100 sqm)",
+            }
+        ),
+        "description": forms.Textarea(
+            attrs={
+                "class": "w-full rounded-xl border p-3 focus:ring-2 focus:ring-indigo-500",
+                "placeholder": "Enter asset description",
+                "rows": 4,
+            }
+        ),
+    }
+    
 class AssetOwnershipForm(forms.ModelForm):
     class Meta:
         model = AssetOwnership

@@ -4,60 +4,82 @@
 
 {% block content %}
 
-<div class="animate__animated animate__fadeIn space-y-10 max-w-[95%] mx-auto [&_input[type=number]]:[appearance:textfield] [&_input[type=number]::-webkit-outer-spin-button]:appearance-none [&_input[type=number]::-webkit-inner-spin-button]:appearance-none">
+<div
+    class="animate__animated animate__fadeIn space-y-10 max-w-[95%] mx-auto [&_input[type=number]]:[appearance:textfield] [&_input[type=number]::-webkit-outer-spin-button]:appearance-none [&_input[type=number]::-webkit-inner-spin-button]:appearance-none">
 
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <h2 class="text-3xl font-black text-slate-800 dark:text-slate-200 tracking-tight">Family Events & Contributions</h2>
-            <p class="text-slate-500 dark:text-slate-400 font-medium">Create events and track member contributions for the family</p>
+            <h2 class="text-3xl font-black text-slate-800 dark:text-slate-200 tracking-tight">Family Events &
+                Contributions</h2>
+            <p class="text-slate-500 dark:text-slate-400 font-medium">Create events and track member contributions for
+                the family</p>
         </div>
-        <button id="openEventModal" class="bg-indigo-600 dark:bg-indigo-500 text-white px-8 py-4 rounded-2xl font-bold hover:bg-indigo-700 dark:hover:bg-indigo-600 transition shadow-xl shadow-indigo-100 dark:shadow-indigo-800 flex items-center gap-2 active:scale-95">
+        <button id="openEventModal"
+            class="bg-indigo-600 dark:bg-indigo-500 text-white px-8 py-4 rounded-2xl font-bold hover:bg-indigo-700 dark:hover:bg-indigo-600 transition shadow-xl shadow-indigo-100 dark:shadow-indigo-800 flex items-center gap-2 active:scale-95">
             <i class="fas fa-plus"></i> Add Event
         </button>
     </div>
 
     <div>
-        <h3 class="text-sm font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+        <h3
+            class="text-sm font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-6 flex items-center gap-2">
             <span class="w-2 h-2 bg-indigo-600 dark:bg-indigo-400 rounded-full animate-pulse"></span>
             Upcoming & Active Events
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
             {% for event in events %}
-            <div class="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group" onclick="openEvent('{{ event.id }}')">
+            <div class="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
+                onclick="openEvent('{{ event.id }}')">
                 <div class="p-8 space-y-6">
                     <div class="flex justify-between items-start">
-                        <span class="px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-widest
+                        <span
+                            class="px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-widest
                             {% if event.type == 'Wedding' %}bg-pink-50 text-pink-600 dark:bg-pink-800/20 dark:text-pink-400
                             {% elif event.type == 'Party' %}bg-amber-50 text-amber-600 dark:bg-amber-800/20 dark:text-amber-400
                             {% elif event.type == 'Funeral' %}bg-slate-100 text-slate-700 dark:bg-slate-800/20 dark:text-slate-300
                             {% else %}bg-indigo-50 text-indigo-600 dark:bg-indigo-800/20 dark:text-indigo-400{% endif %}">
                             {{ event.type }}
                         </span>
-                        <span class="text-xs font-bold text-slate-400 dark:text-slate-300"><i class="far fa-calendar-alt mr-1"></i> {{ event.date|date:"M d, Y" }}</span>
+                        <span class="text-xs font-bold text-slate-400 dark:text-slate-300"><i
+                                class="far fa-calendar-alt mr-1"></i> {{ event.date|date:"M d, Y" }}</span>
                     </div>
 
                     <div>
-                        <h3 class="text-2xl font-black text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{{ event.title }}</h3>
+                        <h3
+                            class="text-2xl font-black text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                            {{ event.title }}</h3>
                         <div class="mt-2 space-y-1">
-                            <p class="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2"><i class="fas fa-users text-slate-300 dark:text-slate-600"></i> Family: <span class="font-semibold text-slate-700 dark:text-slate-200">{{ event.family_name }}</span></p>
-                            <p class="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2"><i class="fas fa-map-marker-alt text-slate-300 dark:text-slate-600"></i> Place: <span class="font-semibold text-slate-700 dark:text-slate-200">{{ event.location }}</span></p>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2"><i
+                                    class="fas fa-users text-slate-300 dark:text-slate-600"></i> Family: <span
+                                    class="font-semibold text-slate-700 dark:text-slate-200">{{ event.family_name
+                                    }}</span></p>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2"><i
+                                    class="fas fa-map-marker-alt text-slate-300 dark:text-slate-600"></i> Place: <span
+                                    class="font-semibold text-slate-700 dark:text-slate-200">{{ event.location }}</span>
+                            </p>
                         </div>
                     </div>
 
                     <div class="flex justify-between items-end pt-6 border-t border-slate-50 dark:border-slate-700">
                         <div>
-                            <p class="text-[10px] text-slate-400 dark:text-slate-500 uppercase font-black tracking-widest">Target Amount</p>
+                            <p
+                                class="text-[10px] text-slate-400 dark:text-slate-500 uppercase font-black tracking-widest">
+                                Target Amount</p>
                             <p class="text-2xl font-black text-emerald-600">Ksh {{ event.goal_amount }}</p>
                         </div>
                         <div class="text-right">
-                            <p class="text-[10px] text-slate-400 dark:text-slate-500 uppercase font-black tracking-widest">Raised</p>
-                            <p class="text-lg font-bold text-slate-700 dark:text-slate-200">Ksh {{ event.total_contributed }}</p>
+                            <p
+                                class="text-[10px] text-slate-400 dark:text-slate-500 uppercase font-black tracking-widest">
+                                Raised</p>
+                            <p class="text-lg font-bold text-slate-700 dark:text-slate-200">Ksh {{
+                                event.total_contributed }}</p>
                         </div>
                     </div>
                 </div>
             </div>
             {% empty %}
-            <div class="col-span-full py-12 text-center bg-slate-50 dark:bg-slate-800 rounded-[2rem] border-2 border-dashed border-slate-200 dark:border-slate-700">
+            <div
+                class="col-span-full py-12 text-center bg-slate-50 dark:bg-slate-800 rounded-[2rem] border-2 border-dashed border-slate-200 dark:border-slate-700">
                 <p class="text-slate-400 dark:text-slate-500 font-medium">No active events.</p>
             </div>
             {% endfor %}
@@ -68,21 +90,26 @@
 
     {% if archived_events %}
     <div class="pt-4">
-        <h3 class="text-sm font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+        <h3
+            class="text-sm font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
             <i class="fas fa-archive"></i>
             Archived Events (Completed)
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
             {% for event in archived_events %}
-            <div class="bg-slate-50/50 dark:bg-slate-900/50 rounded-3xl border border-slate-100 dark:border-slate-700 p-6 opacity-75 hover:opacity-100 transition-opacity cursor-pointer" onclick="openEvent('{{ event.id }}')">
+            <div class="bg-slate-50/50 dark:bg-slate-900/50 rounded-3xl border border-slate-100 dark:border-slate-700 p-6 opacity-75 hover:opacity-100 transition-opacity cursor-pointer"
+                onclick="openEvent('{{ event.id }}')">
                 <div class="flex justify-between items-center mb-4">
                     <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 italic">Past Event</span>
-                    <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500">{{ event.date|date:"M Y" }}</span>
+                    <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500">{{ event.date|date:"M Y"
+                        }}</span>
                 </div>
                 <h4 class="text-lg font-bold text-slate-600 dark:text-slate-200">{{ event.title }}</h4>
                 <div class="mt-4 pt-4 border-t border-slate-200/50 dark:border-slate-700/50">
-                    <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase">Final Amount Raised</p>
-                    <p class="text-xl font-black text-slate-700 dark:text-slate-200">Ksh {{ event.total_contributed }}</p>
+                    <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase">Final Amount Raised
+                    </p>
+                    <p class="text-xl font-black text-slate-700 dark:text-slate-200">Ksh {{ event.total_contributed }}
+                    </p>
                 </div>
             </div>
             {% endfor %}
@@ -93,13 +120,15 @@
 
 <!-- Event Drawer -->
 <div id="eventDrawer" class="fixed inset-0 bg-slate-900/60 dark:bg-slate-900/70 backdrop-blur-sm hidden z-50">
-    <div class="absolute right-0 top-0 h-full w-full max-w-2xl bg-white dark:bg-slate-900 shadow-2xl transition-transform duration-500 ease-out flex flex-col">
+    <div
+        class="absolute right-0 top-0 h-full w-full max-w-2xl bg-white dark:bg-slate-900 shadow-2xl transition-transform duration-500 ease-out flex flex-col">
         <div class="p-8 border-b flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
             <div>
                 <h3 id="drawerTitle" class="text-3xl font-black text-slate-800 dark:text-slate-200 tracking-tight"></h3>
                 <p id="drawerMeta" class="text-slate-500 dark:text-slate-400 font-medium mt-1"></p>
             </div>
-            <button onclick="closeDrawer()" class="h-12 w-12 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 shadow-sm transition">
+            <button onclick="closeDrawer()"
+                class="h-12 w-12 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 shadow-sm transition">
                 <i class="fas fa-times text-xl"></i>
             </button>
         </div>
@@ -107,14 +136,16 @@
         <div class="p-8 space-y-8 overflow-y-auto flex-1">
             <div class="flex justify-between items-center">
                 <h4 class="text-xl font-black text-slate-800 dark:text-slate-200">Contributors List</h4>
-                <button id="openContributionModal" class="bg-emerald-600 dark:bg-emerald-500 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-emerald-700 dark:hover:bg-emerald-600 transition flex items-center gap-2 shadow-lg shadow-emerald-100 dark:shadow-emerald-800">
+                <button id="openContributionModal"
+                    class="bg-emerald-600 dark:bg-emerald-500 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-emerald-700 dark:hover:bg-emerald-600 transition flex items-center gap-2 shadow-lg shadow-emerald-100 dark:shadow-emerald-800">
                     <i class="fas fa-plus"></i> Add Contribution
                 </button>
             </div>
 
             <div class="overflow-hidden border border-slate-100 dark:border-slate-700 rounded-[2rem]">
                 <table class="w-full dark:text-slate-200">
-                    <thead class="bg-slate-50 dark:bg-slate-800 text-[10px] uppercase text-slate-400 dark:text-slate-500 font-black tracking-widest">
+                    <thead
+                        class="bg-slate-50 dark:bg-slate-800 text-[10px] uppercase text-slate-400 dark:text-slate-500 font-black tracking-widest">
                         <tr>
                             <th class="px-6 py-4 text-left">Member Name</th>
                             <th class="px-6 py-4 text-left">Amount Paid</th>
@@ -129,51 +160,42 @@
 </div>
 
 <!-- Event Modal -->
-<div id="eventModal" class="fixed inset-0 bg-slate-900/60 dark:bg-slate-900/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+<div id="eventModal"
+    class="fixed inset-0 bg-slate-900/60 dark:bg-slate-900/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl w-full max-w-lg overflow-hidden">
-        <div class="bg-indigo-600 dark:bg-indigo-500 p-6 text-white text-center">
+        <div class="bg-indigo-600 dark:bg-indigo-500 p-6 text-white flex justify-between items-center">
             <h3 class="text-xl font-black">Create New Event</h3>
+            <button onclick="closeEventModal()"
+                class="h-10 w-10 flex items-center justify-center rounded-full bg-indigo-700 dark:bg-indigo-600 hover:bg-indigo-800 dark:hover:bg-indigo-700 transition">
+                <i class="fas fa-times text-lg"></i>
+            </button>
         </div>
         <form method="post" action="{% url 'add_event' %}" class="p-6 space-y-4">
             {% csrf_token %}
+
+            {% for field in event_form %}
             <div class="space-y-1">
-                <label class="text-[10px] font-black uppercase text-slate-400 dark:text-slate-300 ml-1">Event Title</label>
-                {{ event_form.title }}
+                <label class="text-[10px] font-black uppercase text-slate-400 ml-1">
+                    {{ field.label }}
+                </label>
+                {{ field }}
+                {% if field.errors %}
+                <p class="text-red-500 text-xs">{{ field.errors|striptags }}</p>
+                {% endif %}
             </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div class="space-y-1">
-                    <label class="text-[10px] font-black uppercase text-slate-400 dark:text-slate-300 ml-1">Family</label>
-                    {{ event_form.family_name }}
-                </div>
-                <div class="space-y-1">
-                    <label class="text-[10px] font-black uppercase text-slate-400 dark:text-slate-300 ml-1">Location</label>
-                    {{ event_form.location }}
-                </div>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div class="space-y-1">
-                    <label class="text-[10px] font-black uppercase text-slate-400 dark:text-slate-300 ml-1">Date</label>
-                    {{ event_form.date }}
-                </div>
-                <div class="space-y-1">
-                    <label class="text-[10px] font-black uppercase text-slate-400 dark:text-slate-300 ml-1">Category</label>
-                    {{ event_form.type }}
-                </div>
-            </div>
-            <div class="space-y-1">
-                <label class="text-[10px] font-black uppercase text-slate-400 dark:text-slate-300 ml-1">Target Amount (Ksh)</label>
-                {{ event_form.goal_amount }}
-            </div>
-            <div class="pt-2">
-                <button type="submit" class="w-full bg-indigo-600 dark:bg-indigo-500 text-white py-4 rounded-2xl font-black hover:bg-indigo-700 dark:hover:bg-indigo-600 transition shadow-lg shadow-indigo-100 dark:shadow-indigo-800">Save Event</button>
-                <button type="button" onclick="closeEventModal()" class="w-full mt-2 text-xs font-bold text-slate-400 dark:text-slate-500">Cancel</button>
-            </div>
+            {% endfor %}
+
+            <button type="submit"
+                class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black hover:bg-indigo-700 transition">
+                Save Event
+            </button>
         </form>
     </div>
 </div>
 
 <!-- Contribution Modal WITH FAMILY FIELD -->
-<div id="contributionModal" class="fixed inset-0 bg-slate-900/60 dark:bg-slate-900/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+<div id="contributionModal"
+    class="fixed inset-0 bg-slate-900/60 dark:bg-slate-900/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl w-full max-w-md overflow-hidden">
         <div class="bg-emerald-600 dark:bg-emerald-500 p-6 text-white text-center">
             <h3 class="text-xl font-black">Add Contribution</h3>
@@ -193,13 +215,17 @@
             </div>
 
             <div class="space-y-1">
-                <label class="text-[10px] font-black uppercase text-slate-400 dark:text-slate-300 ml-1">Amount (Ksh)</label>
+                <label class="text-[10px] font-black uppercase text-slate-400 dark:text-slate-300 ml-1">Amount
+                    (Ksh)</label>
                 {{ contribution_form.amount }}
             </div>
 
             <div class="pt-2">
-                <button type="submit" class="w-full bg-emerald-600 dark:bg-emerald-500 text-white py-4 rounded-2xl font-black hover:bg-emerald-700 dark:hover:bg-emerald-600 transition shadow-lg shadow-emerald-100 dark:shadow-emerald-800">Save Contribution</button>
-                <button type="button" onclick="closeContributionModal()" class="w-full mt-2 text-xs font-bold text-slate-400 dark:text-slate-500">Cancel</button>
+                <button type="submit"
+                    class="w-full bg-emerald-600 dark:bg-emerald-500 text-white py-4 rounded-2xl font-black hover:bg-emerald-700 dark:hover:bg-emerald-600 transition shadow-lg shadow-emerald-100 dark:shadow-emerald-800">Save
+                    Contribution</button>
+                <button type="button" onclick="closeContributionModal()"
+                    class="w-full mt-2 text-xs font-bold text-slate-400 dark:text-slate-500">Cancel</button>
             </div>
         </form>
     </div>
@@ -223,7 +249,7 @@
             const url = `/events/json/${eventId}/`;
             const response = await fetch(url);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            
+
             const data = await response.json();
             titleEl.innerText = data.title;
             metaEl.innerText = `${data.family_name} • Target Goal: Ksh ${parseFloat(data.goal_amount).toLocaleString()}`;
@@ -261,7 +287,7 @@
     document.getElementById('openContributionModal').onclick = () => contributionModal.classList.remove('hidden');
     function closeContributionModal() { contributionModal.classList.add('hidden'); }
 
-    eventDrawer.addEventListener('click', function(e) { if (e.target === this) closeDrawer(); });
+    eventDrawer.addEventListener('click', function (e) { if (e.target === this) closeDrawer(); });
 </script>
 
 {% endblock %}

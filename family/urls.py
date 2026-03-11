@@ -4,6 +4,7 @@ from django.shortcuts import redirect
 
 
 
+
 urlpatterns = [
     path('', include('lineage.urls')),
     path('admin/', admin.site.urls),
