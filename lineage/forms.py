@@ -101,7 +101,7 @@ class EventForm(forms.ModelForm):
             "is_active": forms.CheckboxInput(
                 attrs={"class": "h-4 w-4 text-indigo-600 rounded focus:ring-indigo-500"}
             ),
-        }
+        } 
 
     def clean_date(self):
         event_date = self.cleaned_data.get("date")

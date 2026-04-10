@@ -36,18 +36,9 @@
         </button>
     </div>
 
-<<<<<<< HEAD
     <div id="no-results" class="hidden flex flex-col items-center justify-center w-full py-20 text-center animate-fade-in">
     <div class="h-24 w-24 bg-slate-100 dark:bg-slate-800/50 rounded-full flex items-center justify-center text-slate-400 dark:text-slate-500 mb-6 shadow-inner">
         <i class="fas fa-user-slash text-4xl"></i>
-=======
-    <div id="no-results" class="hidden flex-col items-center justify-center py-20 text-center">
-        <div
-            class="h-20 w-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400 mb-4">
-            <i class="fas fa-user-slash text-3xl"></i>
-        </div>
-        <h4 class="text-xl font-bold text-slate-700 dark:text-slate-300">No members found</h4>
->>>>>>> 46732a864a18442f654b4f09735a90461d4d532a
     </div>
     <div class="space-y-2">
         <h4 class="text-2xl font-black text-slate-700 dark:text-slate-200 tracking-tight">No members found</h4>
@@ -55,15 +46,13 @@
     </div>
 </div>
 
-    <div id="table-wrapper"
-        class="bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl rounded-[2.5rem] border border-white dark:border-slate-800 shadow-2xl overflow-hidden">
+    <div id="table-wrapper" class="bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl rounded-[2.5rem] border border-white dark:border-slate-800 shadow-2xl overflow-hidden">
         <div class="overflow-x-auto scrollbar-hide">
             <table class="w-full text-left border-collapse min-w-[750px]">
                 <thead>
-                    <tr
-                        class="bg-slate-50/50 dark:bg-slate-800/50 text-slate-400 uppercase text-[11px] tracking-[0.2em] font-bold">
+                    <tr class="bg-slate-50/50 dark:bg-slate-800/50 text-slate-400 uppercase text-[11px] tracking-[0.2em] font-bold">
                         <th class="px-8 py-6">Family Member</th>
-                        <th class="px-8 py-6">Family</th>
+                        <th class="px-8 py-6">Family Root</th>
                         <th class="px-8 py-6">Birth Year</th>
                         <th class="px-8 py-6 text-right">Lineage</th>
                     </tr>
@@ -74,38 +63,26 @@
                         onclick="openProfile('{{ member.id }}')">
                         <td class="px-8 py-5">
                             <div class="flex items-center gap-4">
-
                                 <div class="flex flex-col">
                                     <div class="flex items-center gap-2">
-                                        <span
-                                            class="font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap searchable-name">
+                                        <span class="font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap searchable-name">
                                             {{ member.first_name }} {{ member.last_name }}</span>
                                         {% if member.gender == 'Male' %}
                                         <i class="fas fa-mars text-blue-500 text-xs shrink-0"></i>
                                         {% else %}
                                         <i class="fas fa-venus text-pink-500 text-xs shrink-0"></i>
                                         {% endif %}
-                                        <div class="flex flex-col">
-
-                                        </div>
                                     </div>
+                                </div>
+                            </div>
                         </td>
                         <td class="px-8 py-5">
-
-                            <span
-                                class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter whitespace-nowrap searchable-type
-                                {% if member.type == 'Parent' %}bg-amber-100 text-amber-700{% else %}bg-sky-100 text-sky-700{% endif %}">
+                            <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter whitespace-nowrap searchable-type bg-sky-100 text-sky-700">
                                 {{ member.get_family_root }}
                             </span>
                         </td>
-
-                        <span
-                            class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter whitespace-nowrap searchable-type bg-sky-100 text-sky-700">
-                            {{ member.get_grandfather}}
-                        </span>
-                        </td>
                         <td class="px-8 py-5 text-slate-500 dark:text-slate-400 font-medium searchable-year">
-                            {{member.birth_date|date:"Y"}}</td>
+                            {{ member.birth_date|date:"Y" }}</td>
                         <td class="px-8 py-5 text-right">
                             <button
                                 onclick="event.stopPropagation(); showTree('{{ member.id }}', '{{ member.first_name|escapejs }} {{ member.last_name|escapejs }}')"
@@ -121,42 +98,36 @@
     </div>
 </div>
 
-
-
 <div id="addMemberModal"
     class="fixed inset-0 z-[130] flex items-center justify-center hidden bg-slate-900/40 backdrop-blur-sm transition-all duration-300 opacity-0 p-4">
     <div id="addMemberContent"
         class="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden transform scale-90 opacity-0 transition-all duration-300 ease-out max-h-[90vh] flex flex-col">
-        <div
-            class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-900">
+        <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
             <div>
                 <h3 class="text-2xl font-black text-indigo-600">New Legacy</h3>
-                <p class="text-indigo-400 font-bold uppercase text-[10px] tracking-widest">Establishing Connection
-                </p>
+                <p class="text-indigo-400 font-bold uppercase text-[10px] tracking-widest">Establishing Connection</p>
             </div>
-            <button onclick="closeAddModal()"
-                class="h-10 w-10 flex items-center justify-center rounded-full text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all">
+            <button onclick="closeAddModal()" class="h-10 w-10 flex items-center justify-center rounded-full text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all">
                 <i class="fas fa-times text-xl"></i>
             </button>
         </div>
-
         <form method="POST" enctype="multipart/form-data" class="flex flex-col flex-grow overflow-hidden">
             {% csrf_token %}
             <div class="p-6 md:p-8 overflow-y-auto scrollbar-hide space-y-6 flex-grow">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="stagger-fields">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {% for field in form %}
                     <div class="space-y-1 transform transition-all duration-500 translate-y-4 opacity-0 field-item">
-                        {{ field.label_tag }}
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{{ field.label }}</label>
                         {{ field }}
+                        {% if field.errors %}
+                            <p class="text-red-500 text-xs">{{ field.errors.0 }}</p>
+                        {% endif %}
                     </div>
                     {% endfor %}
                 </div>
             </div>
-
-            <div
-                class="p-6 bg-white dark:bg-slate-900 border-t border-slate-50 dark:border-slate-800 transform transition-all duration-700 translate-y-8 opacity-0 field-item">
-                <button type="submit"
-                    class="w-full bg-indigo-600 py-5 rounded-[1.5rem] text-white font-black uppercase tracking-[0.2em] text-sm hover:bg-indigo-700 shadow-xl shadow-indigo-100 dark:shadow-none transition-all active:scale-[0.98]">
+            <div class="p-6 bg-white dark:bg-slate-900 border-t border-slate-50 dark:border-slate-800 transform transition-all duration-700 translate-y-8 opacity-0 field-item">
+                <button type="submit" class="w-full bg-indigo-600 py-5 rounded-[1.5rem] text-white font-black uppercase tracking-[0.2em] text-sm hover:bg-indigo-700 shadow-xl transition-all active:scale-[0.98]">
                     Add Member
                 </button>
             </div>
@@ -164,159 +135,98 @@
     </div>
 </div>
 
-<div id="treeModal"
-    class="fixed inset-0 z-[100] flex items-center justify-center hidden bg-slate-900/90 backdrop-blur-sm p-4">
-    <div
-        class="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden animate-tree-pop max-h-[90vh] overflow-y-auto">
-        <div
-            class="p-8 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center sticky top-0 bg-white dark:bg-slate-900 z-20">
-            <div>
-                <h3 id="modalName" class="text-3xl font-black text-slate-900 dark:text-white">Lineage</h3>
-            </div>
-            <button onclick="closeTree()"
-                class="h-12 w-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center"><i
-                    class="fas fa-times"></i></button>
-        </div>
-        <div class="p-10 bg-slate-50/50 dark:bg-slate-950/50 relative min-h-[400px]">
-            <div id="tree-loader"
-                class="absolute inset-0 z-10 flex items-center justify-center bg-white/80 dark:bg-slate-900/80">
-                <div class="animate-spin h-8 w-8 border-4 border-indigo-600 border-t-transparent rounded-full">
-                </div>
-            </div>
-            <div class="relative">
-                <div
-                    class="absolute left-6 top-0 bottom-0 w-1 bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-500 rounded-full">
-                </div>
-                <div class="space-y-12">
-                    <div class="relative pl-16">
-                        <p class="text-[10px] font-black text-indigo-500 uppercase">Great Grandfather</p>
-                        <h4 id="greatGrandfatherName" class="text-xl font-bold">---</h4>
-                    </div>
-                    <div class="relative pl-16">
-                        <p class="text-[10px] font-black text-purple-500 uppercase">Grandfather</p>
-                        <h4 id="grandfatherName" class="text-xl font-bold">---</h4>
-                    </div>
-                    <div class="relative pl-16">
-                        <p class="text-[10px] font-black text-purple-500 uppercase">Father</p>
-                        <h4 id="fatherName" class="text-xl font-bold">---</h4>
-                    </div>
-                    <div class="relative pl-16 scale-110 origin-left">
-                        <p class="text-[10px] font-black text-slate-400 uppercase">Current</p>
-                        <h4 id="treeTargetName" class="text-2xl font-black text-indigo-600">---</h4>
-                    </div>
-                    <div class="relative pl-16">
-                        <p class="text-[10px] font-black text-pink-500 uppercase">Offspring</p>
-                        <h4 id="offspringName" class="text-xl font-bold">---</h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="profileModal"
-    class="fixed inset-0 z-[120] flex items-center justify-center hidden bg-slate-900/60 backdrop-blur-md p-4 transition-all duration-300 opacity-0">
-    <div id="profileContent"
-        class="bg-white dark:bg-slate-900 w-full max-w-xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col transform scale-90 opacity-0 transition-all duration-300 ease-out">
-
-        <div
-            class="p-8 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-indigo-50/50 dark:bg-indigo-900/10">
-            <div>
-                <h3 class="text-2xl font-black text-slate-900 dark:text-white">Member Profile</h3>
-                <p class="text-indigo-600 font-bold uppercase text-[10px] tracking-widest">Personal Identification
-                </p>
-            </div>
-            <button onclick="closeProfile()"
-                class="h-10 w-10 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-red-500 transition-all">
+<div id="treeModal" class="fixed inset-0 z-[100] flex items-center justify-center hidden bg-slate-900/90 backdrop-blur-sm p-4 transition-opacity duration-300">
+    <div id="treeContent" class="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden transform scale-90 opacity-0 transition-all duration-400 ease-out max-h-[90vh] overflow-y-auto">
+        <div class="p-8 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center sticky top-0 bg-white dark:bg-slate-900 z-20">
+            <div><h3 id="modalName" class="text-3xl font-black text-slate-900 dark:text-white">Lineage</h3></div>
+            <button onclick="closeTree()" class="h-12 w-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-indigo-600 transition-colors">
                 <i class="fas fa-times"></i>
             </button>
         </div>
-
-        <div class="p-8 overflow-y-auto max-h-[75vh] scrollbar-hide">
-            <div class="flex flex-col items-center mb-8">
-                <div id="prof-photo-container"
-                    class="h-32 w-32 rounded-3xl bg-indigo-600 text-white flex items-center justify-center overflow-hidden border-4 border-white dark:border-slate-700 shadow-xl mb-4 transform transition-all duration-700 scale-50 opacity-0 prof-item">
-                    <img id="prof-photo" src="" class="h-full w-full object-cover hidden">
-                    <span id="prof-initial" class="text-4xl font-black"></span>
-                </div>
-                <h2 id="prof-fullname"
-                    class="text-3xl font-black text-slate-800 dark:text-white transform transition-all duration-500 translate-y-4 opacity-0 prof-item">
-                    ---</h2>
-                <div id="prof-status-badge"
-                    class="mt-2 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-100 text-slate-600 transform transition-all duration-500 translate-y-4 opacity-0 prof-item">
-                    ---</div>
+        <div class="p-10 bg-slate-50/50 dark:bg-slate-950/50 relative min-h-[450px]">
+            <div id="tree-loader" class="absolute inset-0 z-10 flex items-center justify-center bg-white/80 dark:bg-slate-900/80 transition-opacity duration-300">
+                <div class="animate-spin h-10 w-10 border-4 border-indigo-600 border-t-transparent rounded-full"></div>
             </div>
-
-            <div class="grid grid-cols-2 gap-y-6 gap-x-6">
-                <div class="space-y-1 transform transition-all duration-500 translate-y-4 opacity-0 prof-item">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Birth Date</p>
-                    <p id="prof-birth" class="font-bold text-slate-700 dark:text-slate-200">---</p>
-                </div>
-                <div class="space-y-1 transform transition-all duration-500 translate-y-4 opacity-0 prof-item">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Gender</p>
-                    <p id="prof-gender" class="font-bold text-slate-700 dark:text-slate-200 capitalize">---</p>
-                </div>
-                <div
-                    class="space-y-1 border-t dark:border-slate-800 pt-4 transform transition-all duration-500 translate-y-4 opacity-0 prof-item">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Father</p>
-                    <p id="prof-father" class="font-bold text-slate-700 dark:text-slate-200">---</p>
-                </div>
-                <div
-                    class="space-y-1 border-t dark:border-slate-800 pt-4 transform transition-all duration-500 translate-y-4 opacity-0 prof-item">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Mother</p>
-                    <p id="prof-mother" class="font-bold text-slate-700 dark:text-slate-200">---</p>
-                </div>
-                <div class="space-y-1 transform transition-all duration-500 translate-y-4 opacity-0 prof-item">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Spouse</p>
-                    <p id="prof-spouse" class="font-bold text-slate-700 dark:text-slate-200">---</p>
-                </div>
-                <div class="space-y-1 transform transition-all duration-500 translate-y-4 opacity-0 prof-item">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Job Status</p>
-                    <p id="prof-job" class="font-bold text-slate-700 dark:text-slate-200">---</p>
-                </div>
-                <div
-                    class="col-span-2 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-700 transform transition-all duration-500 translate-y-4 opacity-0 prof-item">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Health &
-                        Disability Status</p>
-                    <p id="prof-disability" class="font-bold text-slate-700 dark:text-slate-200">---</p>
+            <div class="relative">
+                <div class="absolute left-6 top-0 bottom-0 w-1 bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-500 rounded-full opacity-30 animate-pulse"></div>
+                <div class="space-y-10">
+                    <div class="relative pl-16 opacity-0 translate-x-4 transition-all duration-500 tree-node">
+                        <div class="absolute left-[22px] top-3 w-4 h-4 rounded-full bg-indigo-500 border-4 border-white dark:border-slate-900 z-10"></div>
+                        <p class="text-[10px] font-black text-indigo-500 uppercase tracking-widest">Great Grandfather</p>
+                        <h4 id="greatGrandfatherName" class="text-xl font-bold text-slate-800 dark:text-slate-200">---</h4>
+                    </div>
+                    <div class="relative pl-16 opacity-0 translate-x-4 transition-all duration-500 tree-node" style="transition-delay: 100ms;">
+                        <div class="absolute left-[22px] top-3 w-4 h-4 rounded-full bg-purple-500 border-4 border-white dark:border-slate-900 z-10"></div>
+                        <p class="text-[10px] font-black text-purple-500 uppercase tracking-widest">Grandfather</p>
+                        <h4 id="grandfatherName" class="text-xl font-bold text-slate-800 dark:text-slate-200">---</h4>
+                    </div>
+                    <div class="relative pl-16 opacity-0 translate-x-4 transition-all duration-500 tree-node" style="transition-delay: 200ms;">
+                        <div class="absolute left-[22px] top-3 w-4 h-4 rounded-full bg-purple-500 border-4 border-white dark:border-slate-900 z-10"></div>
+                        <p class="text-[10px] font-black text-purple-500 uppercase tracking-widest">Father</p>
+                        <h4 id="fatherName" class="text-xl font-bold text-slate-800 dark:text-slate-200">---</h4>
+                    </div>
+                    <div class="relative pl-16 opacity-0 translate-x-4 transition-all duration-500 tree-node scale-110 origin-left" style="transition-delay: 300ms;">
+                        <div class="absolute left-[22px] top-4 w-5 h-5 rounded-full bg-indigo-600 ring-4 ring-indigo-100 dark:ring-indigo-900/30 border-4 border-white dark:border-slate-900 z-10"></div>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Current Member</p>
+                        <h4 id="treeTargetName" class="text-2xl font-black text-indigo-600">---</h4>
+                    </div>
+                    <div class="relative pl-16 opacity-0 translate-x-4 transition-all duration-500 tree-node" style="transition-delay: 400ms;">
+                        <div class="absolute left-[22px] top-3 w-4 h-4 rounded-full bg-pink-500 border-4 border-white dark:border-slate-900 z-10"></div>
+                        <p class="text-[10px] font-black text-pink-500 uppercase tracking-widest">Offspring</p>
+                        <h4 id="offspringName" class="text-xl font-bold text-slate-800 dark:text-slate-200">---</h4>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<div id="profileModal" class="fixed inset-0 z-[120] flex items-center justify-center hidden bg-slate-900/60 backdrop-blur-md p-4 transition-all duration-300 opacity-0">
+    <div id="profileContent" class="bg-white dark:bg-slate-900 w-full max-w-xl rounded-[2rem] shadow-2xl overflow-hidden flex flex-col transform scale-90 opacity-0 transition-all duration-300 ease-out border border-slate-200 dark:border-slate-800">
+        <div class="p-6 border-b-2 border-dashed border-slate-200 dark:border-slate-800 flex justify-between items-start bg-indigo-50/30 dark:bg-indigo-900/5">
+            <div class="flex gap-6 items-center">
+                <div id="prof-photo-container" class="h-28 w-28 rounded-2xl bg-indigo-600 text-white flex items-center justify-center overflow-hidden border-2 border-white dark:border-slate-700 shadow-lg shrink-0 transform transition-all duration-700 scale-50 opacity-0 prof-item">
+                    <img id="prof-photo" src="" class="h-full w-full object-cover hidden">
+                    <span id="prof-initial" class="text-4xl font-black"></span>
+                </div>
+                <div class="space-y-1">
+                    <p class="text-indigo-600 font-black uppercase text-[10px] tracking-[0.2em]">Member Identification</p>
+                    <h2 id="prof-fullname" class="text-2xl font-black text-slate-800 dark:text-white leading-tight transform transition-all duration-500 translate-y-4 opacity-0 prof-item">---</h2>
+                    <div id="prof-status-badge" class="inline-block px-3 py-1 rounded-md text-[9px] font-black uppercase tracking-widest bg-indigo-600 text-white transform transition-all duration-500 translate-y-4 opacity-0 prof-item">---</div>
+                </div>
+            </div>
+            <button onclick="closeProfile()" class="h-8 w-8 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-red-500 shadow-sm transition-all"><i class="fas fa-times text-sm"></i></button>
+        </div>
+        <div class="p-8 overflow-y-auto max-h-[60vh] scrollbar-hide">
+            <div class="grid grid-cols-2 gap-y-6 gap-x-8">
+                <div class="space-y-1 transform transition-all duration-500 translate-y-4 opacity-0 prof-item"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Date of Birth</p><p id="prof-birth" class="font-bold text-slate-700 dark:text-slate-200">---</p></div>
+                <div class="space-y-1 transform transition-all duration-500 translate-y-4 opacity-0 prof-item"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Gender</p><p id="prof-gender" class="font-bold text-slate-700 dark:text-slate-200 capitalize">---</p></div>
+                <div class="col-span-2 grid grid-cols-2 gap-x-8 pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <div class="space-y-1 transform transition-all duration-500 translate-y-4 opacity-0 prof-item"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Father</p><p id="prof-father" class="font-bold text-slate-700 dark:text-slate-200 text-sm">---</p></div>
+                    <div class="space-y-1 transform transition-all duration-500 translate-y-4 opacity-0 prof-item"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Mother</p><p id="prof-mother" class="font-bold text-slate-700 dark:text-slate-200 text-sm">---</p></div>
+                </div>
+                <div class="space-y-1 transform transition-all duration-500 translate-y-4 opacity-0 prof-item"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Spouse</p><p id="prof-spouse" class="font-bold text-slate-700 dark:text-slate-200">---</p></div>
+                <div class="space-y-1 transform transition-all duration-500 translate-y-4 opacity-0 prof-item"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Employment</p><p id="prof-job" class="font-bold text-slate-700 dark:text-slate-200">---</p></div>
+                <div class="col-span-2 bg-slate-50 dark:bg-slate-800/40 p-5 rounded-2xl border border-slate-100 dark:border-slate-700 transform transition-all duration-500 translate-y-4 opacity-0 prof-item">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Medical Notes</p>
+                    <p id="prof-disability" class="font-bold text-slate-700 dark:text-slate-200 text-sm leading-relaxed">---</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-<<<<<<< HEAD
+<style>
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+
     /* Form Field Styles */
     #addMemberModal input, 
     #addMemberModal select, 
     #addMemberModal textarea {
-=======
-<style>
-    .scrollbar-hide::-webkit-scrollbar {
-        display: none;
-    }
-
-    #addMemberModal label {
-        font-size: 0.85rem;
-        font-weight: 500;
-        color: #1e293b;
-        margin-bottom: 0.25rem;
-        display: block;
-    }
-
-    .dark #addMemberModal label {
-        color: #94a3b8;
-    }
-
-    #addMemberModal input,
-    #addMemberModal select {
->>>>>>> 46732a864a18442f654b4f09735a90461d4d532a
         width: 100%;
         padding: 0.875rem 1.25rem;
         border-radius: 1.25rem;
         background-color: #f8fafc;
-<<<<<<< HEAD
         border: 2px solid #f1f5f9;
         color: #1e293b;
         font-weight: 600;
@@ -333,21 +243,10 @@
     #addMemberModal input:focus,
     #addMemberModal select:focus, 
     #addMemberModal textarea:focus{
-=======
-        border: 1px solid #f1f5f9;
-        font-weight: 500;
-        outline: none;
-        transition: all 0.3s ease;
-    }
-
-    #addMemberModal input:focus,
-    #addMemberModal select:focus {
->>>>>>> 46732a864a18442f654b4f09735a90461d4d532a
         border-color: #6366f1;
         background-color: #fff;
-        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.05);
+        box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.1);
     }
-<<<<<<< HEAD
     .dark #addMemberModal input:focus, 
     .dark #addMemberModal select:focus, 
     .dark #addMemberModal textarea:focus {
@@ -359,49 +258,13 @@
     .content-show { opacity: 1 !important; transform: scale(1) !important; }
     .field-show { opacity: 1 !important; transform: translateY(0) !important; }
     .tree-node-show { opacity: 1 !important; transform: translateX(0) scale(1) !important; }
-=======
-
-    .dark #addMemberModal input,
-    .dark #addMemberModal select {
-        background-color: #0f172a;
-        border-color: #1e293b;
-        color: white;
-    }
-
-    .modal-show {
-        opacity: 1 !important;
-        display: flex !important;
-    }
-
-    .content-show {
-        opacity: 1 !important;
-        transform: scale(1) !important;
-    }
-
-    .field-show {
-        opacity: 1 !important;
-        transform: translateY(0) !important;
-    }
-
-    @keyframes treePop {
-        from {
-            opacity: 0;
-            transform: scale(0.9) translateY(20px);
-        }
-
-        to {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-        }
-    }
-
-    .animate-tree-pop {
-        animation: treePop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-    }
->>>>>>> 46732a864a18442f654b4f09735a90461d4d532a
 </style>
 
 <script>
+    function resetAnimations(selector, className) {
+        document.querySelectorAll(selector).forEach(el => el.classList.remove(className));
+    }
+
     function openAddModal() {
         const modal = document.getElementById('addMemberModal');
         const content = document.getElementById('addMemberContent');
@@ -412,7 +275,7 @@
             modal.classList.add('modal-show');
             content.classList.add('content-show');
             fields.forEach((field, index) => {
-                setTimeout(() => field.classList.add('field-show'), 100 + (index * 35));
+                setTimeout(() => field.classList.add('field-show'), 150 + (index * 60));
             });
         }, 10);
     }
@@ -420,45 +283,91 @@
     function closeAddModal() {
         const modal = document.getElementById('addMemberModal');
         const content = document.getElementById('addMemberContent');
-        const fields = document.querySelectorAll('.field-item');
         content.classList.remove('content-show');
         modal.classList.remove('modal-show');
-        fields.forEach(f => f.classList.remove('field-show'));
-        setTimeout(() => modal.classList.add('hidden'), 300);
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            resetAnimations('.field-item', 'field-show');
+        }, 300);
     }
 
+   
 
+    function openProfile(id) {
+        const modal = document.getElementById("profileModal");
+        const content = document.getElementById("profileContent");
+        const profItems = document.querySelectorAll('.prof-item');
+        resetAnimations('.prof-item', 'field-show');
+        document.getElementById('prof-photo-container').classList.remove('scale-100', 'opacity-100');
+        modal.classList.remove("hidden");
+        setTimeout(() => { modal.classList.add("modal-show"); content.classList.add("content-show"); }, 10);
 
-    function showTree(id, name) {
-        const modal = document.getElementById('treeModal');
-        const loader = document.getElementById('tree-loader');
-        document.getElementById('modalName').innerText = name;
-        document.getElementById('treeTargetName').innerText = name;
-        modal.classList.remove('hidden');
-        loader.classList.remove('hidden');
-
-        fetch(`/get-lineage/${id}/`)
-            .then(res => {
-                if (!res.ok) throw new Error('Lineage data not found');
-                return res.json();
-            })
+        fetch(`/get-member-details/${id}/`)
+            .then(res => res.json())
             .then(data => {
-                document.getElementById('greatGrandfatherName').innerText = data.great_grandfather || "Not Available";
-                document.getElementById('grandfatherName').innerText = data.grandfather || "Not Available";
-                document.getElementById('fatherName').innerText = data.father || "Not Available";
-                document.getElementById('offspringName').innerText = data.offspring_summary || "None Recorded";
-                loader.classList.add('hidden');
-            })
-            .catch(err => {
-                console.error(err);
-                loader.classList.add('hidden');
-                alert("Error loading lineage.");
+                document.getElementById("prof-fullname").textContent = `${data.first_name} ${data.last_name}`;
+                document.getElementById("prof-status-badge").textContent = data.status || "MEMBER";
+                document.getElementById("prof-birth").textContent = data.birth_date || "---";
+                document.getElementById("prof-gender").textContent = data.gender || "---";
+                document.getElementById("prof-father").textContent = data.father || "---";
+                document.getElementById("prof-mother").textContent = data.mother || "---";
+                document.getElementById("prof-spouse").textContent = data.spouse || "---";
+                document.getElementById("prof-job").textContent = data.job_status || "---";
+                document.getElementById("prof-disability").textContent = data.disability_status || "No observations recorded.";
+                
+                const photo = document.getElementById("prof-photo");
+                const initial = document.getElementById("prof-initial");
+                if (data.photo_url) { photo.src = data.photo_url; photo.classList.remove("hidden"); initial.classList.add("hidden"); }
+                else { photo.classList.add("hidden"); initial.classList.remove("hidden"); initial.textContent = data.first_name[0]; }
+
+                setTimeout(() => {
+                    document.getElementById('prof-photo-container').classList.add('scale-100', 'opacity-100');
+                    profItems.forEach((item, index) => { setTimeout(() => item.classList.add('field-show'), 50 * index); });
+                }, 100);
             });
     }
 
-    function closeTree() { document.getElementById('treeModal').classList.add('hidden'); }
+    function closeProfile() {
+        const modal = document.getElementById('profileModal');
+        modal.classList.remove('modal-show');
+        setTimeout(() => modal.classList.add('hidden'), 300);
+    }
 
-    // SEARCH LOGIC
+    function showTree(id, name) {
+        const modal = document.getElementById('treeModal');
+        const content = document.getElementById('treeContent');
+        const loader = document.getElementById('tree-loader');
+        const nodes = document.querySelectorAll('.tree-node');
+        document.getElementById('modalName').innerText = name;
+        document.getElementById('treeTargetName').innerText = name;
+        resetAnimations('.tree-node', 'tree-node-show');
+        modal.classList.remove('hidden');
+        setTimeout(() => { modal.classList.add('opacity-100'); content.classList.add('content-show'); }, 10);
+        loader.classList.remove('hidden', 'opacity-0');
+
+        fetch(`/get-lineage/${id}/`)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('greatGrandfatherName').innerText = data.great_grandfather || "Unknown";
+                document.getElementById('grandfatherName').innerText = data.grandfather || "Unknown";
+                document.getElementById('fatherName').innerText = data.father || "Unknown";
+                document.getElementById('offspringName').innerText = data.offspring_summary || "No offspring recorded";
+                loader.classList.add('opacity-0');
+                setTimeout(() => {
+                    loader.classList.add('hidden');
+                    nodes.forEach((node, index) => { setTimeout(() => node.classList.add('tree-node-show'), index * 80); });
+                }, 300);
+            });
+    }
+
+    function closeTree() {
+        const modal = document.getElementById('treeModal');
+        const content = document.getElementById('treeContent');
+        content.classList.remove('content-show');
+        modal.classList.remove('opacity-100');
+        setTimeout(() => modal.classList.add('hidden'), 300);
+    }
+
     document.getElementById('live-search').addEventListener('input', function (e) {
         const term = e.target.value.toLowerCase().trim();
         const rows = document.querySelectorAll('.member-row');
