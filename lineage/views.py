@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.db.models import Q
 from django.utils import timezone
-from .models import Person, Event, Contribution, Asset
+from .models import AssetOwnership, Person, Event, Contribution, Asset
 from .forms import (
     AssetForm,
     AssetOwnershipForm,
@@ -78,16 +78,11 @@ def dashboard(request):
             }
         )
 
-    recent_activities = sorted(
-        recent_activities, key=lambda x: x["created_at"], reverse=True
-    )[:5]
-
     context = {
         "total_parents": total_parents,
         "total_children": total_children,
         "total_assets": total_assets,
         "upcoming_event": upcoming_event,
-        "recent_activities": recent_activities,
     }
 
     return render(request, "lineage/dashboard.html", context)
@@ -131,24 +126,19 @@ def event_list(request):
 
 
 def event_create(request):
-    form = EventForm(request.POST or None)
 
-    if form.is_valid():
-        form.save()
-        return redirect("event_list")
-
-    return render(request, "lineage/form.html", {"form": form})
+    return render(request, "lineage/contributions.html")
 
 
 def event_update(request, pk):
     event = get_object_or_404(Event, pk=pk)
-    form = EventForm(request.POST or None, instance=event)
+    form1 = EventForm(request.POST or None, instance=event)
 
-    if form.is_valid():
-        form.save()
+    if form1.is_valid():
+        form1.save()
         return redirect("event_list")
 
-    return render(request, "lineage/form.html", {"form": form})
+    return render(request, "lineage/form.html", {"form1": form1})
 
 
 def event_delete(request, pk):
@@ -157,29 +147,54 @@ def event_delete(request, pk):
     return redirect("event_list")
 
 
-def contribution_create(request):
+def contributions(request):
+    event_form = EventForm()
+    return render(request, "lineage/contributions.html", {"event_form": event_form})
+
+
+def event_create(request):
+    event_form = EventForm(request.POST or None)
+
+    if request.method == "POST" and event_form.is_valid():
+        event_form.save()
+        return redirect("contributions")  # go back to the page with the modal
+
+    return render(request, "lineage/contributions.html", {"event_form": event_form})
+
+
+# this is dummy for now
+def add_contribution(request):
     form = ContributionForm(request.POST or None)
 
     if form.is_valid():
         form.save()
-        return redirect("dashboard")
+        return redirect("contributions")
 
-    return render(request, "lineage/contributions.html", {"form": form})
+    return render(request, "lineage/form.html", {"form": form})
 
 
 def asset_list(request):
     assets = Asset.objects.all()
-    return render(request, "lineage/asset.html", {"assets": assets})
+    total_valuation = sum(a.valuation for a in assets)
+    if request.method == "POST":
+        form = AssetForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("assets")
+        else:
+            print(form.errors)
+    else:
+        form = AssetForm()
 
-
-def asset_create(request):
-    form = AssetForm(request.POST or None)
-
-    if form.is_valid():
-        form.save()
-        return redirect("asset_list")
-
-    return render(request, "lineage/form.html", {"form": form})
+    return render(
+        request,
+        "lineage/assets.html",
+        {
+            "assets": assets,
+            "form": form,
+            "total_valuation": total_valuation,
+        },
+    )
 
 
 def asset_update(request, pk):
@@ -233,10 +248,6 @@ def recent_activities_api(request):
         )
 
     return JsonResponse({"activities": activities})
-
-
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
 
 
 def get_lineage(request, pk):

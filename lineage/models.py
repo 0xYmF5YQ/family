@@ -229,7 +229,7 @@ class Asset(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     owners = models.ManyToManyField(
-        Person, through="AssetOwnership", related_name="assets"
+        Person, through="AssetOwnership", related_name="assets", blank=True
     )
 
     def total_ownership_percentage(self):
@@ -238,6 +238,7 @@ class Asset(models.Model):
     def __str__(self):
         return f"{self.title} ({self.get_status_display()})"
 
+  
 
 class AssetOwnership(models.Model):
     asset = models.ForeignKey(
