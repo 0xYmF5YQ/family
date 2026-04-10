@@ -1,4 +1,5 @@
 {% extends 'lineage/base.html' %}
+{% block title %}Family Members | Usunye Family{% endblock %}
 {% block content %}
 <div class="max-w-[95%] mx-auto px-4 py-8 animate-fade-in">
 
@@ -16,7 +17,7 @@
                 <i class="fas fa-tree text-2xl"></i>
             </div>
             <div>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Directory</p>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Family Members</p>
                 <h3 class="text-4xl font-black text-slate-800 dark:text-white">{{ total_count }}</h3>
             </div>
         </div>
@@ -35,12 +36,15 @@
         </button>
     </div>
 
-    <div id="no-results" class="hidden flex-col items-center justify-center py-20 text-center">
-        <div class="h-20 w-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400 mb-4">
-            <i class="fas fa-user-slash text-3xl"></i>
-        </div>
-        <h4 class="text-xl font-bold text-slate-700 dark:text-slate-300">No members found</h4>
+    <div id="no-results" class="hidden flex flex-col items-center justify-center w-full py-20 text-center animate-fade-in">
+    <div class="h-24 w-24 bg-slate-100 dark:bg-slate-800/50 rounded-full flex items-center justify-center text-slate-400 dark:text-slate-500 mb-6 shadow-inner">
+        <i class="fas fa-user-slash text-4xl"></i>
     </div>
+    <div class="space-y-2">
+        <h4 class="text-2xl font-black text-slate-700 dark:text-slate-200 tracking-tight">No members found</h4>
+        <p class="text-slate-400 dark:text-slate-500 font-medium">Try adjusting your search terms</p>
+    </div>
+</div>
 
     <div id="table-wrapper" class="bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl rounded-[2.5rem] border border-white dark:border-slate-800 shadow-2xl overflow-hidden">
         <div class="overflow-x-auto scrollbar-hide">
@@ -215,7 +219,7 @@
 <style>
     .scrollbar-hide::-webkit-scrollbar { display: none; }
 
-    /* Base Input Styling */
+    /* Form Field Styles */
     #addMemberModal input, 
     #addMemberModal select, 
     #addMemberModal textarea {
@@ -224,42 +228,36 @@
         border-radius: 1.25rem;
         background-color: #f8fafc;
         border: 2px solid #f1f5f9;
-        font-weight: 600;
         color: #1e293b;
+        font-weight: 600;
         outline: none;
         transition: all 0.3s ease;
     }
-
-    /* DARK MODE FIX: Explicitly targeting field types for specificity */
-    .dark #addMemberModal input,
-    .dark #addMemberModal input[type="text"],
-    .dark #addMemberModal input[type="date"],
-    .dark #addMemberModal input[type="number"],
-    .dark #addMemberModal select,
-    .dark #addMemberModal textarea {
-        background-color: #0f172a !important; /* Deep Navy/Slate */
-        border-color: #1e293b !important;
-        color: #f8fafc !important;
+    .dark #addMemberModal input, 
+    .dark #addMemberModal select, 
+    .dark #addMemberModal textarea{
+        background-color: #0f172a;
+        border-color: #1e293b;
+        color: white;
     }
-
-    /* Focus States */
-    #addMemberModal input:focus, 
-    #addMemberModal select:focus {
+    #addMemberModal input:focus,
+    #addMemberModal select:focus, 
+    #addMemberModal textarea:focus{
         border-color: #6366f1;
         background-color: #fff;
         box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.1);
     }
-
     .dark #addMemberModal input:focus, 
-    .dark #addMemberModal select:focus {
-        background-color: #1e293b !important;
-        border-color: #818cf8 !important;
+    .dark #addMemberModal select:focus, 
+    .dark #addMemberModal textarea:focus {
+        background-color: #1e293b; 
     }
 
-    /* Modal Animation Classes */
+    /* Animation Hooks */
     .modal-show { opacity: 1 !important; display: flex !important; }
     .content-show { opacity: 1 !important; transform: scale(1) !important; }
     .field-show { opacity: 1 !important; transform: translateY(0) !important; }
+    .tree-node-show { opacity: 1 !important; transform: translateX(0) scale(1) !important; }
 </style>
 
 <script>
