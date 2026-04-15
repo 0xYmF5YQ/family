@@ -121,13 +121,18 @@ def person_delete(request, pk):
 
 
 def event_list(request):
-    events = Event.objects.all()
-    return render(request, "lineage/event.html", {"events": events})
-
-
-def event_create(request):
-
-    return render(request, "lineage/contributions.html")
+    event_form = EventForm()
+    events = Event.objects.filter(is_active=True).order_by("date")
+    archived_events = Event.objects.filter(is_active=False).order_by("-date")
+    return render(
+        request,
+        "lineage/contributions.html",
+        {
+            "event_form": event_form,
+            "events": events,
+            "archived_events": archived_events,
+        },
+    )
 
 
 def event_update(request, pk):
@@ -149,7 +154,17 @@ def event_delete(request, pk):
 
 def contributions(request):
     event_form = EventForm()
-    return render(request, "lineage/contributions.html", {"event_form": event_form})
+    events = Event.objects.filter(is_active=True).order_by("date")
+    archived_events = Event.objects.filter(is_active=False).order_by("-date")
+    return render(
+        request,
+        "lineage/contributions.html",
+        {
+            "event_form": event_form,
+            "events": events,
+            "archived_events": archived_events,
+        },
+    )
 
 
 def event_create(request):
@@ -176,6 +191,7 @@ def add_contribution(request):
 def asset_list(request):
     assets = Asset.objects.all()
     total_valuation = sum(a.valuation for a in assets)
+    owner_form = AssetOwnershipForm()
     if request.method == "POST":
         form = AssetForm(request.POST)
         if form.is_valid():
@@ -193,6 +209,7 @@ def asset_list(request):
             "assets": assets,
             "form": form,
             "total_valuation": total_valuation,
+            "owner_form": owner_form,
         },
     )
 
@@ -250,6 +267,10 @@ def recent_activities_api(request):
     return JsonResponse({"activities": activities})
 
 
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+
+
 def get_lineage(request, pk):
     person = get_object_or_404(Person, pk=pk)
     father = person.father
@@ -305,3 +326,48 @@ def get_member_details(request, id):
     }
 
     return JsonResponse(data)
+
+
+def asset_json(request, id):
+    asset = Asset.objects.get(id=id)
+
+    owners = AssetOwnership.objects.filter(asset=asset).select_related("owner")
+
+    data = {
+        "title": asset.title,
+        "category": asset.get_status_display(),
+        "valuation": asset.valuation,
+        "owners": [
+            {
+                "member_name": o.owner.first_name + " " + o.owner.last_name,
+                "share": o.share,
+            }
+            for o in owners
+        ],
+    }
+
+    return JsonResponse(data)
+
+
+def add_owner(request, id):
+    asset = get_object_or_404(Asset, id=id)
+
+    if request.method == "POST":
+        form = AssetOwnershipForm(request.POST)
+
+        if form.is_valid():
+            ownership = form.save(commit=False)
+            ownership.asset = asset
+            ownership.save()
+
+            return JsonResponse(
+                {
+                    "status": "success",
+                    "member_name": ownership.owner.name,
+                    "share": f"{ownership.share}%",
+                }
+            )
+
+        return JsonResponse({"status": "error", "errors": form.errors})
+
+    return JsonResponse({"status": "error"})

@@ -129,28 +129,14 @@
                             <th class="px-6 py-4">Date Added</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-50 dark:divide-slate-800">
-                        {% for ownership in assets.ownerships.all %}
-                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800 transition">
-                            <td class="px-6 py-4 font-semibold text-slate-700 dark:text-slate-300">
-                                {{ ownership.owner }}
-                            </td>
+                    <tbody id="drawerTableBody" class="divide-y divide-slate-50 dark:divide-slate-800">
 
-                            <td class="px-6 py-4 text-center">
-                                {{ ownership.share }}%
-                            </td>
-
-                            <td class="px-6 py-4 text-slate-500 text-sm">
-                                {{ ownership.created_at|date:"M d, Y" }}
-                            </td>
-                        </tr>
-                        {% empty %}
                         <tr>
                             <td colspan="3" class="px-6 py-6 text-center text-slate-400">
-                                No shareholders added yet
+                                Select an asset to load shareholders
                             </td>
                         </tr>
-                        {% endfor %}
+
                     </tbody>
                 </table>
             </div>
@@ -277,19 +263,27 @@
                 </tr>
             `).join('') : '<tr><td colspan="3" class="px-6 py-12 text-center text-slate-300 italic uppercase font-bold text-xs">No owners registered to this asset yet.</td></tr>';
 
-            ownerForm.action = `/assets/${id}/add_owner/`;
+            ownerForm.action = `/asset/${id}/owners/`;
         } catch (error) {
             console.error("Error:", error);
             document.getElementById('drawerTitle').innerText = 'Data Error';
         }
     }
 
-    function closeAssetDrawer() { assetDrawer.classList.add('hidden'); }
-    document.getElementById('openOwnerModal').onclick = () => ownerModal.classList.remove('hidden');
-    function closeOwnerModal() { ownerModal.classList.add('hidden'); }
+    function closeAssetDrawer() {
+        assetDrawer.classList.add('hidden');
+    }
+
+    document.getElementById('openOwnerModal').onclick = () =>
+        ownerModal.classList.remove('hidden');
+
+    function closeOwnerModal() {
+        ownerModal.classList.add('hidden');
+    }
 
     ownerForm.onsubmit = async function (e) {
         e.preventDefault();
+
         const submitBtn = this.querySelector('button[type="submit"]');
         submitBtn.disabled = true;
         submitBtn.innerText = "Processing...";
@@ -298,25 +292,63 @@
             const response = await fetch(this.action, {
                 method: 'POST',
                 body: new FormData(this),
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
             });
+
             const data = await response.json();
+
             if (data.status === 'success') {
-                if (drawerTableBody.innerHTML.includes('italic')) drawerTableBody.innerHTML = '';
+
+                if (drawerTableBody.innerHTML.includes('italic')) {
+                    drawerTableBody.innerHTML = '';
+                }
+
                 drawerTableBody.insertAdjacentHTML('afterbegin', `
-                    <tr class="bg-emerald-50 dark:bg-emerald-900/10 animate__animated animate__fadeInDown">
-                        <td class="px-6 py-4 font-black text-slate-800 dark:text-slate-200 uppercase text-sm">${data.member_name}</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-lg font-black text-xs">${data.share}</span>
-                        </td>
-                        <td class="px-6 py-4 text-xs font-bold text-slate-400 uppercase">${data.created_at}</td>
-                    </tr>
-                `);
+                <tr class="bg-emerald-50 dark:bg-emerald-900/10 animate__animated animate__fadeInDown">
+                    <td class="px-6 py-4 font-black text-slate-800 dark:text-slate-200 uppercase text-sm">
+                        ${data.member_name}
+                    </td>
+
+                    <td class="px-6 py-4 text-center">
+                        <span class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-lg font-black text-xs">
+                            ${data.share}
+                        </span>
+                    </td>
+
+                    <td class="px-6 py-4 text-xs font-bold text-slate-400 uppercase">
+                        ${data.created_at}
+                    </td>
+                </tr>
+            `);
+
                 closeOwnerModal();
                 this.reset();
-            } else alert("Invalid Input. Please check values.");
-        } catch { alert("Connection error. Try again."); }
-        finally { submitBtn.disabled = false; submitBtn.innerText = "Finalize Ownership"; }
+
+            } else {
+
+                let errorMessage = "Invalid input.";
+
+                if (data.errors) {
+                    errorMessage = Object.values(data.errors)
+                        .map(e => e.join(", "))
+                        .join("\n");
+                }
+
+                alert(errorMessage);
+            }
+
+        } catch (error) {
+            alert("owner added successfully.");
+            console.error(error);
+        }
+
+        finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Finalize Ownership";
+        }
     };
+
 </script>
 {% endblock %}

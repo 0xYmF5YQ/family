@@ -138,6 +138,7 @@ class AssetForm(forms.ModelForm):
             "description",
             "owners",
         ]
+
     widgets = {
         "title": forms.TextInput(
             attrs={
@@ -176,12 +177,12 @@ class AssetForm(forms.ModelForm):
             }
         ),
     }
-    
+
+
 class AssetOwnershipForm(forms.ModelForm):
     class Meta:
         model = AssetOwnership
         fields = [
-            "asset",
             "owner",
             "share",
         ]

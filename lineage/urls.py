@@ -26,4 +26,6 @@ urlpatterns = [
         views.get_member_details,
         name="get_member_details",
     ),
+    path("assets/json/<int:id>/", views.asset_json, name="asset_json"),
+    path("asset/<int:id>/owners/", views.add_owner, name="add_owner"),
 ]
