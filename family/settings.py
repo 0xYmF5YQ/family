@@ -97,3 +97,9 @@ LOGOUT_REDIRECT_URL = "login"
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
 ]
+
+# CSRF Configuration for development
+CSRF_COOKIE_SECURE = False  # Set to True in production with HTTPS
+CSRF_COOKIE_HTTPONLY = False  # Must be False to allow JavaScript access
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_AGE = 1209600  # 2 weeks

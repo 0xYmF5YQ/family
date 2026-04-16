@@ -1,43 +1,46 @@
-# from django.shortcuts import render, redirect
-# from django.contrib.auth import login, authenticate, logout
-# from django.contrib.auth.forms import User, AuthenticationForm
-# from django.contrib import messages
-# from .forms import LoginForm
-# #from .models import Parents, Children
+from django.shortcuts import render, redirect
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.views.decorators.csrf import ensure_csrf_cookie
+from .forms import LoginForm
 
 
-# def login_view(request):
-#     if request.method == 'POST':
+@ensure_csrf_cookie
+def login_view(request):
+    """
+    Handle user login. Supports authentication via:
+    - Username and password
+    """
+    if request.user.is_authenticated:
+        return redirect("dashboard")
 
-#         name = request.POST.get('name', '').strip()
-#         birth_year = request.POST.get('birth_year', '').strip()
-#         password = request.POST.get('password', '').strip()
+    form = LoginForm()  # Initialize form for GET requests
 
-#         user = None
-#         if name and birth_year:
-#             user = authenticate(request, username=name, password=birth_year)
-#         if not user and name and password:
-#             user = authenticate(request, username=name, password=password)
+    if request.method == "POST":
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data.get("name", "").strip()
+            password = form.cleaned_data.get("password", "").strip()
 
-#         if user:
-#             login(request, user)
-#             display_name = user.username
-#             person = Parents.objects.filter(user=user).first()
-#             if not person:
-#                 person = Children.objects.filter(user=user).first()
+            # Try to authenticate with username and password
+            user = authenticate(request, username=name, password=password)
 
-#             if person:
-#                 display_name = person.name
+            if user:
+                login(request, user)
+                display_name = user.get_full_name() or user.username
+                messages.success(request, f"Welcome back, {display_name}!")
+                return redirect("dashboard")
+            else:
+                form.add_error(
+                    None, "Invalid credentials. Please check your name and password."
+                )
+
+    return render(request, "auth/login.html", {"form": form})
 
 
-#             messages.success(request, f"Welcome back, {display_name}!")
-#             return redirect('dashboard')
-#         else:
-#             messages.error(request, "Invalid Credentials.")
-
-#     return render(request, 'auth/login.html')
-
-# def logout_view(request):
-#     logout(request)
-#     messages.info(request, "You have been logged out.")
-#     return redirect('login')
+def logout_view(request):
+    """Log out the current user and redirect to login page."""
+    logout(request)
+    messages.info(request, "You have been logged out.")
+    return redirect("login")

@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.db.models import Q
 from django.utils import timezone
+from django.contrib.auth.decorators import login_required
 from .models import AssetOwnership, Person, Event, Contribution, Asset
 from .forms import (
     AssetForm,
@@ -14,6 +15,7 @@ from django.utils.timesince import timesince
 from django.http import JsonResponse
 
 
+@login_required(login_url="login")
 def dashboard(request):
     total_parents = (
         Person.objects.filter(
@@ -88,6 +90,7 @@ def dashboard(request):
     return render(request, "lineage/dashboard.html", context)
 
 
+@login_required(login_url="login")
 def person_list(request):
     persons = Person.objects.all()
     form = PersonForm(request.POST or None, request.FILES or None)
@@ -97,12 +100,14 @@ def person_list(request):
     return render(request, "lineage/family.html", {"persons": persons, "form": form})
 
 
+@login_required(login_url="login")
 def person_create(request):
     form = PersonForm(request.POST or None, request.FILES or None)
 
     return render(request, "lineage/form.html", {"form": form})
 
 
+@login_required(login_url="login")
 def person_update(request, pk):
     person = get_object_or_404(Person, pk=pk)
     form = PersonForm(request.POST or None, request.FILES or None, instance=person)
@@ -114,12 +119,14 @@ def person_update(request, pk):
     return render(request, "lineage/profile.html", {"form": form})
 
 
+@login_required(login_url="login")
 def person_delete(request, pk):
     person = get_object_or_404(Person, pk=pk)
     person.delete()
     return redirect("person_list")
 
 
+@login_required(login_url="login")
 def event_list(request):
     event_form = EventForm()
     events = Event.objects.filter(is_active=True).order_by("date")
@@ -135,6 +142,7 @@ def event_list(request):
     )
 
 
+@login_required(login_url="login")
 def event_update(request, pk):
     event = get_object_or_404(Event, pk=pk)
     form1 = EventForm(request.POST or None, instance=event)
@@ -146,12 +154,14 @@ def event_update(request, pk):
     return render(request, "lineage/form.html", {"form1": form1})
 
 
+@login_required(login_url="login")
 def event_delete(request, pk):
     event = get_object_or_404(Event, pk=pk)
     event.delete()
     return redirect("event_list")
 
 
+@login_required(login_url="login")
 def contributions(request):
     event_form = EventForm()
     events = Event.objects.filter(is_active=True).order_by("date")
@@ -167,6 +177,7 @@ def contributions(request):
     )
 
 
+@login_required(login_url="login")
 def event_create(request):
     event_form = EventForm(request.POST or None)
 
@@ -177,6 +188,7 @@ def event_create(request):
     return render(request, "lineage/contributions.html", {"event_form": event_form})
 
 
+@login_required(login_url="login")
 # this is dummy for now
 def add_contribution(request):
     form = ContributionForm(request.POST or None)
@@ -188,6 +200,7 @@ def add_contribution(request):
     return render(request, "lineage/form.html", {"form": form})
 
 
+@login_required(login_url="login")
 def asset_list(request):
     assets = Asset.objects.all()
     total_valuation = sum(a.valuation for a in assets)
@@ -214,6 +227,7 @@ def asset_list(request):
     )
 
 
+@login_required(login_url="login")
 def asset_update(request, pk):
     asset = get_object_or_404(Asset, pk=pk)
     form = AssetForm(request.POST or None, instance=asset)
@@ -225,12 +239,14 @@ def asset_update(request, pk):
     return render(request, "lineage/form.html", {"form": form})
 
 
+@login_required(login_url="login")
 def asset_delete(request, pk):
     asset = get_object_or_404(Asset, pk=pk)
     asset.delete()
     return redirect("asset_list")
 
 
+@login_required(login_url="login")
 def add_asset_ownership(request):
     form = AssetOwnershipForm(request.POST or None)
 
@@ -241,6 +257,7 @@ def add_asset_ownership(request):
     return render(request, "lineage/form.html", {"form": form})
 
 
+@login_required(login_url="login")
 def recent_activities_api(request):
     page_number = request.GET.get("page", 1)
 
@@ -271,6 +288,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 
 
+@login_required(login_url="login")
 def get_lineage(request, pk):
     person = get_object_or_404(Person, pk=pk)
     father = person.father
@@ -294,6 +312,7 @@ def get_lineage(request, pk):
     )
 
 
+@login_required(login_url="login")
 def get_member_details(request, id):
     person = get_object_or_404(Person, id=id)
 
@@ -328,6 +347,7 @@ def get_member_details(request, id):
     return JsonResponse(data)
 
 
+@login_required(login_url="login")
 def asset_json(request, id):
     asset = Asset.objects.get(id=id)
 
@@ -349,6 +369,7 @@ def asset_json(request, id):
     return JsonResponse(data)
 
 
+@login_required(login_url="login")
 def add_owner(request, id):
     asset = get_object_or_404(Asset, id=id)
 

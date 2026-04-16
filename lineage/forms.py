@@ -101,7 +101,7 @@ class EventForm(forms.ModelForm):
             "is_active": forms.CheckboxInput(
                 attrs={"class": "h-4 w-4 text-indigo-600 rounded focus:ring-indigo-500"}
             ),
-        } 
+        }
 
     def clean_date(self):
         event_date = self.cleaned_data.get("date")
@@ -194,3 +194,26 @@ class AssetOwnershipForm(forms.ModelForm):
                 "Ownership share must be between 0 and 100 percent."
             )
         return share
+
+
+class LoginForm(forms.Form):
+    """Form for user authentication via name/birth year or name/password."""
+
+    name = forms.CharField(
+        max_length=150,
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "Full Name",
+                "class": "w-full bg-slate-50 dark:bg-slate-800/50 text-sm p-4 rounded-2xl border border-slate-100 dark:border-slate-700 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 dark:text-white transition-all outline-none",
+            }
+        ),
+    )
+    password = forms.CharField(
+        max_length=150,
+        widget=forms.PasswordInput(
+            attrs={
+                "placeholder": "Password / Year of Birth",
+                "class": "w-full bg-slate-50 dark:bg-slate-800/50 text-sm p-4 rounded-2xl border border-slate-100 dark:border-slate-700 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 dark:text-white transition-all outline-none",
+            }
+        ),
+    )
